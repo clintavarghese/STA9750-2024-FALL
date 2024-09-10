@@ -2,9 +2,9 @@
 title: "About Me"
 ---
 
-Hi, I'm Clinta Puthussery Varghese, currently pursuing my second semester as a graduate student in Statistics at Baruch College, with an anticipated graduation in May 2026. I aspire to become a Data Scientist, blending my passion for statistics, data analysis, and computational biology.
+Hi, I'm Clinta Puthussery Varghese, currently pursuing my second semester as a graduate student in Statistics at [Zicklin School of Business](https://zicklin.baruch.cuny.edu/) in the [Baruch College](https://baruch.cuny.edu/), [City University Of New York](https://www.cuny.edu/) with an anticipated graduation in May 2026. I aspire to become a Data Scientist, blending my passion for statistics, data analysis, and computational biology.
 
-I am currently working as a Research Assistant at Weill Cornell Medicine in the Computational Biology Lab. Additionally, I serve as a Graduate Tutor, supporting courses such as STA 9708, CIS 9650, and CIS 9340. I also hold a Graduate Teaching Assistant role under Professor Yue Yu in the Paul H. Chook Department of Information Systems and Statistics.
+I am currently working as a Research Assistant at Weill Cornell Medicine in the Computational Biology Lab. Additionally, I serve as a Graduate Tutor, supporting courses such as STA 9708, CIS 9650, and CIS 9340. I also hold a Graduate Teaching Assistant role under [Professor Yu Yue](https://zicklin.baruch.cuny.edu/faculty-profile/yu-ryan-yue/) in the Paul H. Chook Department of Information Systems and Statistics.
 
 In my free time, I enjoy crafting, especially diamond art painting, and traveling to explore new places.
 
