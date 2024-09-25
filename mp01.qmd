@@ -136,6 +136,7 @@ str(USAGE)
 For easier readability, the column names are renamed, for ex: `UZA Name` can be renamed as `metro_area`. I have decided to keep UPT and VRM as is since its harder to rename with its full abbreviation.
 
 #### Task 1
+
 ::: callout
 ##### Creating Syntatic Names
 
@@ -149,6 +150,7 @@ USAGE <- rename(USAGE,
 :::
 
 #### TASK 2
+
 ::: callout
 ##### Recoding the `Mode` column
 
@@ -219,7 +221,7 @@ FINANCIALS <-FINANCIALS |>
     ))
 ```
 
-Here is the overview of the ridership data (`FINANCIALS`), 
+Here is the overview of the ridership data (`FINANCIALS`),
 
 ```{r,echo=FALSE}
 FINANCIALS |>  DT::datatable()
@@ -227,14 +229,13 @@ FINANCIALS |>  DT::datatable()
 
 #### Task 4
 
-###### Answering Instructor Specified Questions with `dplyr`.\
+###### Answering Instructor Specified Questions with `dplyr`. 
 
 **A.Vehicle Revenue Miles (VRM) Analysis**\
 
 `VRM` refers to *Vehicle Revenue Miles*.
 
-It is the miles that vehicles are scheduled to or actually travel while in revenue service. 
-(total number of miles traveled by a vehicle while it is in service and generating revenue by transporting passengers. It is used in public transportation and transit systems to measure the productive service a vehicle provides.)
+It is the miles that vehicles are scheduled to or actually travel while in revenue service. (total number of miles traveled by a vehicle while it is in service and generating revenue by transporting passengers. It is used in public transportation and transit systems to measure the productive service a vehicle provides.)
 
 Vehicle revenue miles include: *Layover / recovery time*\
 Vehicle revenue miles exclude: *Deadhead, Operator training,Vehicle maintenance testing, and Other non-revenue uses of vehicles.*
@@ -254,7 +255,8 @@ table_creation<-function(x){
   )  
 }
 ```
->> By summarizing VRM across transit agencies from `2002 to 2024`,  (I created a function named table_creation to tables)
+
+> > By summarizing VRM across transit agencies from `2002 to 2024`, (I created a function named table_creation to tables)
 
 ```{r}
 table_creation(
@@ -268,9 +270,6 @@ table_creation(
 The transit agency with the highest VRM in the sample is identified as
 
 `Agency`: `MTA New York City Transit` with `Total_VRM`: `10.83 billion.`
-
-
-
 
 > **2.Which transit mode had the most total VRM?**\
 > Similarly, the analysis was performed by transit mode and arranged in descending order.
@@ -335,7 +334,7 @@ slice(1:5))
 
 There are 38 agencies operating in the NY–Jersey City–Newark, NY–NJ metro area and 22 agencies in the Los Angeles–Long Beach, CA region. Let's focus on the NY–NJ area.
 
-```{r, echo=FALSE,results = 'hide',warning=FALSE,message=FALSE}
+```{r, echo=FALSE,results='hide',warning=FALSE,message=FALSE}
 USAGE<-USAGE|>mutate(year=year(month))
 NY_NJ<-USAGE |> 
   filter(metro_area == "New York--Jersey City--Newark, NY--NJ") |>
@@ -359,7 +358,9 @@ table_creation(NY_NJ %>%
   summarize(count = n() )%>%  # Count occurrences of each mode
   ungroup()|>arrange(desc(count)))
 ```
+
 Most agencies in NY-NJ Metro area offers `Bus` services. Lets see how is the presence of each mode with in Agencies.
+
 ```{r,echo=FALSE}
 NY_NJ <- NY_NJ |> 
   mutate(Agency = case_when(
@@ -372,7 +373,6 @@ NY_NJ <- NY_NJ |>
   ))
 ```
 
-
 ```{r,echo=FALSE,message=FALSE}
 agency_modes_2023 <- NY_NJ %>%
   filter(year == 2023) %>%
@@ -381,9 +381,6 @@ agency_modes_2023 <- NY_NJ %>%
   ungroup()
 
 ```
-
-
-
 
 ```{r,echo=FALSE}
 ggplot(agency_modes_2023, aes(x = Mode, y = Agency)) +
@@ -399,16 +396,16 @@ ggplot(agency_modes_2023, aes(x = Mode, y = Agency)) +
     panel.grid.major.x = element_blank())
 
 ```
+
 It's surprising to see that the `Vanpool` service is exclusively offered by NJT. Given the vastness of the NY-NJ metropolitan area, it would be beneficial to promote `Vanpool` services similar to how other major cities like the SF-LA area are doing.
 
->#3 Which Mode of transit achieved the highest Vehicle Revenue Miles (VRM) per trip each year.
+> #3 Which Mode of transit achieved the highest Vehicle Revenue Miles (VRM) per trip each year.
 
-The VRM per trip ratio provides valuable insights into agency efficiency. A lower ratio indicates higher vehicle utilization, meaning the agency is transporting more passengers per mile of service. 
-Typically, urban areas tend to have lower VRM per trip ratios compared to rural areas.
+The VRM per trip ratio provides valuable insights into agency efficiency. A lower ratio indicates higher vehicle utilization, meaning the agency is transporting more passengers per mile of service. Typically, urban areas tend to have lower VRM per trip ratios compared to rural areas.
 
 To assess the efficiency of agencies in the NY–NJ metropolitan area, we calculated the ratio of VRM to Unlinked Passenger Trips (UPT). This ratio reflects how well transit systems are utilizing their vehicles in relation to passenger demand, with a lower VRM/UPT ratio indicating better efficiency.
 
->#Which Transist Mode is profitable in termns of VRM/UPT Ratio: 
+> #Which Transist Mode is profitable in termns of VRM/UPT Ratio:
 
 ```{r,echo=FALSE,warning=FALSE}
 ggplot(NY_NJ|>filter(year>=2021,year<=2024)|>group_by(Agency,Mode)|>ungroup(), aes(x = ratio, y = Mode,fill=Mode)) +
@@ -427,9 +424,11 @@ table_creation(
     summarize(median_ratio=round(median(ratio,na.rm=TRUE),2), )|>
                 arrange(median_ratio))
 ```
+
 ```{r}
 print("Table for mean of median VRM/UPT ratios for each mode in NY-NJ Metro Area from 2021 to 2024")
 ```
+
 ```{r,echo=FALSE}
 table_creation(
 # Calculate the mean of median ratios for each mode from 2021 to 2024
@@ -442,6 +441,7 @@ mean_median_ratios <- NY_NJ %>%
  
 
 ```
+
 `Ferryboat` service and `heavy rail` service has the lowest VRM/UPT ratio after factoring no-agencies contributing to the data, This means those modes have better operational efficiency in terms of ridership relative to miles driven.
 
 :::
@@ -452,7 +452,7 @@ mean_median_ratios <- NY_NJ %>%
 
 Analysing some data about financial recovery
 
-The `USAGE` and `FINANCIALS` datasets were combined, and as a threshold total UPT > 400000 is been taken into consideration.
+The `USAGE` and `FINANCIALS` datasets were combined, and as a threshold total UPT \> 400000 is been taken into consideration.
 
 ```{r, results = 'hide'}
 USAGE_2022_ANNUAL<- USAGE |> filter(year=="2022")|>
@@ -560,19 +560,19 @@ table_creation(USAGE_AND_FINANCIALS_top |>
 
 [Hampton Jitney](https://en.wikipedia.org/wiki/Hampton_Jitney) is a commuter bus company.  Their Three primary routes from the east end of Long Island (The Hamptons and the North Fork) to New York City. Hampton Jitney also operates charter and tour services, along with local transit bus service in eastern Suffolk County under contract with Suffolk County Transit.\
 
-##### Why Hampton Jitney, Inc. has the highest fare per UPT? 
+##### Why Hampton Jitney, Inc. has the highest fare per UPT?
 
-- **Wealthy Customer Base** : The Hampton Jitney serves affluent passengers traveling between New York City and the Hamptons, a popular destination for wealthy individuals. These passengers are generally less sensitive to price and are willing to pay premium fares for a convenient, comfortable ride.\
+-   **Wealthy Customer Base** : The Hampton Jitney serves affluent passengers traveling between New York City and the Hamptons, a popular destination for wealthy individuals. These passengers are generally less sensitive to price and are willing to pay premium fares for a convenient, comfortable ride.\
 
-- **Private Agency** : As a private transportation service, Hampton Jitney is not bound by government fare controls or subsidies. This allows the agency to charge market-based fares that reflect the demand and exclusive nature of the service.\
+-   **Private Agency** : As a private transportation service, Hampton Jitney is not bound by government fare controls or subsidies. This allows the agency to charge market-based fares that reflect the demand and exclusive nature of the service.\
 
-- **Premium Service** : The Hampton Jitney offers luxury features such as comfortable seating, Wi-Fi, and direct routes, which justify the higher fare prices. Customers are paying not just for transportation, but for an upscale, stress-free experience.
+-   **Premium Service** : The Hampton Jitney offers luxury features such as comfortable seating, Wi-Fi, and direct routes, which justify the higher fare prices. Customers are paying not just for transportation, but for an upscale, stress-free experience.
 
-- **Convenient and Direct Routes**: The bus service offers direct transportation from Manhattan to the Hamptons, saving passengers the hassle of driving or taking multiple transfers on public transportation. This convenience is a major factor in the willingness of passengers to pay higher fares.
+-   **Convenient and Direct Routes**: The bus service offers direct transportation from Manhattan to the Hamptons, saving passengers the hassle of driving or taking multiple transfers on public transportation. This convenience is a major factor in the willingness of passengers to pay higher fares.
 
-- **Seasonal Demand**: The Hamptons is a popular summer destination, and during peak seasons, demand for transportation to and from the area skyrockets. Hampton Jitney can charge premium fares during these high-demand periods, further increasing their fare per UPT.\
+-   **Seasonal Demand**: The Hamptons is a popular summer destination, and during peak seasons, demand for transportation to and from the area skyrockets. Hampton Jitney can charge premium fares during these high-demand periods, further increasing their fare per UPT.\
 
-- **Conclusion**: Hampton Jitney's high fare per ride is driven by its affluent customer base, premium service offerings, convenient routes, and its ability to charge market-driven prices as a private agency. The high fare reflects the value that customers place on convenience and comfort, particularly when traveling to a luxury destination like the Hamptons.\
+-   **Conclusion**: Hampton Jitney's high fare per ride is driven by its affluent customer base, premium service offerings, convenient routes, and its ability to charge market-driven prices as a private agency. The high fare reflects the value that customers place on convenience and comfort, particularly when traveling to a luxury destination like the Hamptons.\
 
 > #### 4. **Transit System with the Lowest Expenses per Vehicle Revenue Mile (VRM)**
 
@@ -598,13 +598,13 @@ The [Bay Area Vanpool Program](https://511.org/vanpool), managed by the MTC, sup
 
 According to the [Berkleyside](https://www.berkeleyside.org/2022/11/20/casual-carpool-bay-bridge-covid-traffi), Casual Carpool was a Bay Area tradition before COVID. Post Covid, longtime riders and drivers who want to revive casual carpool are finding it difficult to reestablish the famously organic tradition. But since many people are returning to work and seeking efficient ways to travel, and it’s interesting to observe that there’s a slow resurgence of this informal carpooling tradition.
 
-##### Why MTC'S Vanpool reduce expenses per Vehicle Revenue Mile (VRM)? 
+##### Why MTC'S Vanpool reduce expenses per Vehicle Revenue Mile (VRM)?
 
-- **Cost-Effective Commute** : Vanpooling is often more economical than driving alone, with participants sharing the costs of fuel, tolls, and maintenance. This can lead to significant savings for commuters.\
+-   **Cost-Effective Commute** : Vanpooling is often more economical than driving alone, with participants sharing the costs of fuel, tolls, and maintenance. This can lead to significant savings for commuters.\
 
-- **Sustainable Way** : By reducing the number of single-occupancy vehicles on the road, vanpools help decrease traffic congestion and lower greenhouse gas emissions, contributing to a more sustainable environment.\
+-   **Sustainable Way** : By reducing the number of single-occupancy vehicles on the road, vanpools help decrease traffic congestion and lower greenhouse gas emissions, contributing to a more sustainable environment.\
 
-- **Vanpool Rewards** : The MTC actively promotes vanpooling as part of its broader strategy to enhance public transportation options and reduce reliance on individual car travel. Each counties provides different benefits including pre-tax benefits, discounted parking permits and subsidies for commuter vanpoolers\
+-   **Vanpool Rewards** : The MTC actively promotes vanpooling as part of its broader strategy to enhance public transportation options and reduce reliance on individual car travel. Each counties provides different benefits including pre-tax benefits, discounted parking permits and subsidies for commuter vanpoolers\
 
 > #### 5. **Transit System with the Highest Total Fares per VRM**
 
@@ -625,15 +625,15 @@ table_creation(USAGE_AND_FINANCIALS_top |>
 **Mode:** `Ferryboat`\
 **Fares per VRM:** `157.70 $/mile`
 
-The St. Johns River Ferry is an important transportation link, providing service across the St. Johns River and facilitating commuter travel. 
+The St. Johns River Ferry is an important transportation link, providing service across the St. Johns River and facilitating commuter travel.
 
-##### What do you believe to be the most efficient transit system in the country? 
+##### What do you believe to be the most efficient transit system in the country?
 
 In my view, the most efficient transit system is one that prioritizes the needs of the community rather than focusing solely on generating revenue. Such a system aims to provide reliable and accessible transportation options that serve the public effectively. Among the various transit modes analyzed, I find `ferryboats` to be particularly efficient, especially in terms of their overall Vehicle Revenue Miles (VRM) to Unlinked Passenger Trips (UPT) ratio. This efficiency indicates that ferryboats are capable of serving a substantial number of passengers relative to the distance traveled, making them a viable option for enhancing urban mobility.
 
 Additionally, when considering cost-effectiveness and environmental sustainability, the `Vanpool` mode emerges as the best option. Vanpools not only reduce operational costs but also contribute positively to the environment by minimizing the number of individual vehicles on the road. By consolidating passengers into fewer vehicles, Vanpools can significantly decrease carbon emissions and traffic congestion, promoting a greener transit solution.
 
-Ultimately, an efficient transit system should not merely aim for financial gain but should instead focus on fulfilling the transportation needs of its users while fostering sustainable practices. By investing in transit options like ferryboats and Vanpools, cities can create a more effective and environmentally friendly transportation network that benefits both the community and the planet. 
+Ultimately, an efficient transit system should not merely aim for financial gain but should instead focus on fulfilling the transportation needs of its users while fostering sustainable practices. By investing in transit options like ferryboats and Vanpools, cities can create a more effective and environmentally friendly transportation network that benefits both the community and the planet.
 
 #### Appendix
 
