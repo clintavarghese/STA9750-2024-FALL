@@ -223,13 +223,15 @@ FINANCIALS <-FINANCIALS |>
 
 Here is the overview of the ridership data (`FINANCIALS`),
 
-```{r,echo=FALSE}
+```{r}
 FINANCIALS |>  DT::datatable()
 ```
 
 #### Task 4
 
-###### Answering Instructor Specified Questions with `dplyr`. 
+::: callout
+
+###### Answering Instructor Specified Questions with `dplyr`.
 
 **A.Vehicle Revenue Miles (VRM) Analysis**\
 
@@ -262,14 +264,14 @@ table_creation<-function(x){
 table_creation(
   USAGE %>%
     group_by(Agency) %>%
-    summarise(total_VRM = sum(VRM)) %>%
-    arrange(desc(total_VRM)) %>%
+    summarise(`total_VRM($/miles)` = sum(VRM)) %>%
+    arrange(desc(`total_VRM($/miles)`)) %>%
     slice(1:3))
 ```
 
 The transit agency with the highest VRM in the sample is identified as
 
-`Agency`: `MTA New York City Transit` with `Total_VRM`: `10.83 billion.`
+`Agency`: `MTA New York City Transit` with `Total_VRM`: `10.83 billion revenue miles`
 
 > **2.Which transit mode had the most total VRM?**\
 > Similarly, the analysis was performed by transit mode and arranged in descending order.
@@ -277,11 +279,11 @@ The transit agency with the highest VRM in the sample is identified as
 ```{r}
 table_creation(USAGE %>%
   group_by(Mode) %>%
-  summarise(total_VRM = sum(VRM)) %>%
-  arrange(desc(total_VRM)) |> slice(1:3))
+  summarise(`total_VRM($/miles)` = sum(VRM)) %>%
+  arrange(desc(`total_VRM($/miles)`) )|> slice(1:3))
 ```
 
-The transist Mode (`Motor Bus`) had the total VRM of (`49.45 billion`)
+The transist Mode (`Motor Bus`) had the total VRM of (`49.45 billion revenue miles`)
 
 > **3.NYC Subway Ridership in May 2024**\
 > To analyze ridership on the NYC Subway, we filtered the data for `Heavy Rail` in May 2024 and retrieved UPT values:
@@ -299,7 +301,7 @@ The monthly ridership of subway for month of May 2025 is total UPT of (`180.46 m
 
 ```{r,echo=FALSE}
 NYC_subway <- USAGE %>%
-  filter(month >= "2019-04-01", month <= "2020-04-01", Mode == 'Heavy Rail' & str_detect(Agency, "New York City"))
+  filter(month>="2019-04-01", month <= "2024-04-01", , Mode == 'Heavy Rail' & str_detect(Agency, "New York City"))
 
 # Calculate the percentage decline from April 2019 to April 2020
 start_value <- NYC_subway %>% filter(month == "2019-04-01") %>% pull(UPT)
@@ -310,16 +312,17 @@ decline_percentage <- ((start_value - end_value) / start_value) * 100
 ggplot(NYC_subway, aes(month, UPT / 1000000)) +
   geom_line(color="blue") +
   scale_y_continuous(labels = scales::comma) +
-  labs(title = paste("NYC Subway Ridership Data (April 2019 - April 2020)\nDecline: ",
-                     round(decline_percentage, 2), "%"),  # Display decline percentage in title
-       x = "Month",
+  labs(title = paste("NYC Subway Ridership Data (April 2019 - April 2024)\nDecline: ",
+                     round(decline_percentage, 2), "% from (04/2019-04/2020)"),  # Display decline percentage in title
+       x = "timeline",
        y = "UPT (Unlinked Passenger Trips) in Millions") +
   theme_minimal()
 
 
 ```
 
-The subway system experienced a **91.28% decline** in ridership between April 2019 and April 2020.
+The subway system experienced a **91.28% decline** in ridership between April 2019 and April 2020.\
+However, post-pandemic, ridership has been steadily increasing.However,with the rise of hybrid work culture, monthly UPT rides now show a fluctuating, zigzag pattern.
 
 > **Questions that I explore by myself**\
 > \
@@ -343,7 +346,7 @@ NY_NJ<-USAGE |>
     total_VRM = sum(VRM, na.rm = TRUE), 
     total_UPT = sum(UPT, na.rm = TRUE), 
     
-    ratio = if_else(total_VRM>0, total_VRM,NA_real_) / if_else(total_UPT > 0, total_UPT, NA_real_)
+    ratio = if_else(total_VRM>0, total_VRM,NA_real_) / if_else(total_UPT > 0, total_UPT, NA_real_), .groups = 'drop'
   )|>ungroup()
 ```
 
@@ -377,7 +380,7 @@ NY_NJ <- NY_NJ |>
 agency_modes_2023 <- NY_NJ %>%
   filter(year == 2023) %>%
   group_by(Agency, Mode) %>%
-  summarize(count = n()) %>%  # Count occurrences of each mode
+  summarize(count = n(),.groups="drop") %>%  # Count occurrences of each mode
   ungroup()
 
 ```
@@ -408,32 +411,34 @@ To assess the efficiency of agencies in the NY–NJ metropolitan area, we calcul
 > #Which Transist Mode is profitable in termns of VRM/UPT Ratio:
 
 ```{r,echo=FALSE,warning=FALSE}
-ggplot(NY_NJ|>filter(year>=2021,year<=2024)|>group_by(Agency,Mode)|>ungroup(), aes(x = ratio, y = Mode,fill=Mode)) +
+ggplot(NY_NJ|>filter(year>=2002,year<=2024)|>group_by(Agency,Mode)|>ungroup(), aes(x = ratio, y = Mode,fill=Mode)) +
   geom_boxplot() +
-  labs(title = "Distribution of VRM/UPT Ratios by Transit Mode from 2021 - 2024",
+  labs(title = "Distribution of VRM/UPT Ratios by Transit Mode from 2002 - 2024",
        y = "Transit Mode", 
        x = "VRM/UPT Ratio") +
   theme_minimal() +
   theme(legend.position = "none")
 ```
 
-```{r}
+```{r,echo=FALSE,results='hide'}
+cat("## Median Ratio by Agency and Mode (Up to 2024)\n")
 table_creation(
-  NY_NJ|>filter(year>=2021,year<=2024)|>
+  NY_NJ|>filter(year<=2024)|>
     group_by(Agency,Mode)|>
-    summarize(median_ratio=round(median(ratio,na.rm=TRUE),2), )|>
+    summarize(median_ratio=round(median(ratio,na.rm=TRUE),2),.groups="drop")|>
                 arrange(median_ratio))
 ```
 
 ```{r}
-print("Table for mean of median VRM/UPT ratios for each mode in NY-NJ Metro Area from 2021 to 2024")
+
 ```
 
 ```{r,echo=FALSE}
+cat("## Table for mean of median VRM/UPT ratios for each mode in NY-NJ Metro Area Till 2024")
 table_creation(
 # Calculate the mean of median ratios for each mode from 2021 to 2024
 mean_median_ratios <- NY_NJ %>%
-  filter(year >= 2021, year <= 2024) %>%
+  filter(year <= 2024) %>%
   group_by(Agency, Mode) %>%
   summarize(median_ratio = median(ratio, na.rm = TRUE), .groups = 'drop') %>%  # Calculate median ratio for each agency and mode
   group_by(Mode) %>%
@@ -442,7 +447,7 @@ mean_median_ratios <- NY_NJ %>%
 
 ```
 
-`Ferryboat` service and `heavy rail` service has the lowest VRM/UPT ratio after factoring no-agencies contributing to the data, This means those modes have better operational efficiency in terms of ridership relative to miles driven.
+`Ferryboat` service and `heavy rail` service has the lowest VRM/UPT ratio after factoring no-agencies contributing to the data, This means those modes have better operational efficiency in terms of ridership relative to miles driven. Since there is only 1 agency contributing to the bus rapid transist, it is hard to determine its universality.
 
 :::
 
@@ -454,7 +459,8 @@ Analysing some data about financial recovery
 
 The `USAGE` and `FINANCIALS` datasets were combined, and as a threshold total UPT \> 400000 is been taken into consideration.
 
-```{r, results = 'hide'}
+```{r,echo=FALSE}
+
 USAGE_2022_ANNUAL<- USAGE |> filter(year=="2022")|>
   group_by(`NTD ID`,
 Agency,
@@ -462,7 +468,7 @@ metro_area,
 Mode)|>
   summarize(
     total_UPT=sum(UPT,na.rm = TRUE),
-    total_VRM=sum(VRM,na.rm = TRUE)
+    total_VRM=sum(VRM,na.rm = TRUE),.groups="drop"
   )|>
   ungroup()
 
@@ -473,13 +479,17 @@ USAGE_AND_FINANCIALS <- left_join(USAGE_2022_ANNUAL,
 USAGE_AND_FINANCIALS_top<-USAGE_AND_FINANCIALS |> filter(total_UPT>=400000) 
 ```
 
+```{r}
+USAGE_AND_FINANCIALS_top|>DT:: datatable()
+```
+
 ### Farebox Recovery and Cost Efficiency in Transit Systems
 
 > #### 1. **Transit System with the Highest Farebox Recovery For The Year 2022**
 
 Farebox recovery is the ratio of Total Fares to Total Expenses, measuring how effectively fare revenue covers a transit system's operational costs. It's crucial for a transit agency to generate enough revenue from passengers to offset its operating expenses. A higher farebox recovery ratio reduces the agency's reliance on alternative funding sources to keep the transit system running.
 
-```{r}
+```{r,warning=FALSE}
 table_creation(USAGE_AND_FINANCIALS_top |> 
   group_by(Agency, Mode) |> 
   summarize(
