@@ -3,13 +3,15 @@ title: "About Me"
 ---
 
 
->Just as beauty is in the eye of the beholder, the true power of data rests in the hands of the analyst.
->Even the messiest datasets can reveal meaningful and impactful insights that contribute to social good. 
+Hi, 
 
-Hi, I'm Clinta Puthussery Varghese, currently pursuing my second semester as a graduate student in Statistics at [Zicklin School of Business](https://zicklin.baruch.cuny.edu/) in the [Baruch College](https://baruch.cuny.edu/), [City University Of New York](https://www.cuny.edu/) with anticipated graduation in May 2026. I aspire to become a Data Scientist, blending my passion for statistics, and data analysis.
+I'm a dreamer, fighter, and explorer who is not afraid to step out of my comfort zone and venture into any unknown territory. My name is Clinta Puthussery Varghese and I am currently pursuing my second semester as a graduate student in Statistics at [Zicklin School of Business](https://zicklin.baruch.cuny.edu/) in the [Baruch College](https://baruch.cuny.edu/), [City University Of New York](https://www.cuny.edu/) with an anticipated graduation in May 2026.\
 
-I am currently interning at Weill Cornell Medicine in their Computational Biology Lab. Additionally, I serve as a Graduate Tutor, supporting courses such as STA 9708, CIS 9650, and CIS 9340. I also hold a Graduate Teaching Assistant role under [Professor Yu Yue](https://zicklin.baruch.cuny.edu/faculty-profile/yu-ryan-yue/) in the Paul H. Chook Department of Information Systems and Statistics.
+My aspiration is to become a Data Scientist. As beauty lies in the eyes of the beholder, so too does the power of data rest in the hands of the analyst. I am dedicated to equipping myself to work with messy data, uncover insights, and ultimately contribute to making the world a better place.
+
+I am currently interning at Weill Cornell Medicine in the Computational Biology Lab under [Dr. Annalise Schweickart](https://www.linkedin.com/in/annalise-schweickart-904896b3/). Additionally, I serve as a Graduate Tutor, supporting courses such as [STA 9708](https://baruch-graduate.catalog.cuny.edu/courses/0947211), [CIS 9650], and [CIS 9340]. I also hold a Graduate Teaching Assistant role under [Professor Yu Yue](https://zicklin.baruch.cuny.edu/faculty-profile/yu-ryan-yue/) in the Paul H. Chook Department of Information Systems and Statistics.
 
 In my free time, I enjoy crafting, especially diamond art painting, and traveling to explore new places.
 
 Feel free to connect with me on [LinkedIn](https://www.linkedin.com/in/clintavarghese).
+
