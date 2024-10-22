@@ -10,7 +10,7 @@ execute:
 
 Hollywood has often used familiar strategies to attract audiences, like making movies based on real-life stories, adapting books or games, or working with popular intellectual properties. However, in recent years, movie theaters have seen fewer big box office hits, and audiences aren't flocking to see the latest films as they used to.
 
-This project aims to find new movie ideas by analyzing data from the Internet Movie Database (IMDb). By looking at what made past movies successful, identifying top actors and directors, and learning from past failures, we hope to give Hollywood executives useful insights for creating movies that can draw audiences back to theaters.
+This project aims to find new movie ideas by analyzing data from the Internet Movie Database (IMDb). By looking at what made past movies successful, identifying top actors and directors,popular genres.. we hope to give Hollywood executives useful insights for creating movies that can draw audiences back to theaters.
 
 ### II.Data Preparation
 
@@ -259,7 +259,7 @@ TITLE_PRINCIPALS1 <- TITLE_PRINCIPALS1 |> semi_join(TITLE_RATINGS, join_by(tcons
 
 
 ```
-### III.Initial Exploration
+### III. Initial Exploration
 ::: callout
 #### Task 1: Column Type Correction
 :::
@@ -634,17 +634,17 @@ projects1|>select(primaryTitle,new_rating,numVotes)|>distinct()|>
 
 ```{r}
 #| label: "successful_projects"
-#| eval: false
 #| message: false 
 #| warning: false
 #| cache: false
 #| code-fold: true
 #|code-summary: "Show the code"
+library(dplyr)
 library(ggplot2)
 projects1 |>
   filter(new_rating > median(averageRating)) |>
-  group_by(genre_cleaned) |>
-  summarize(count = n(), .groups = "drop") |>
+  group_by(genre_cleaned)|>
+  summarize(count = n(), .groups = "drop")|>
   ggplot(aes(x = reorder(genre_cleaned, count), y = count, fill = genre_cleaned)) +
   geom_bar(stat = "identity") +
   labs(
@@ -1044,7 +1044,7 @@ anim <- ALL_MOVIES_1 |>
 From this graph, we could identify that `Dramas`,`Comedy`,`Action`,`Adventure`, `Crime` have been always popular. However, there is a good amount attention being given for `Biography` and `Animations` in recent years.
 
 
-###VI.Successful Personnel in the Genre
+### VI.Successful Personnel in the Genre
 
 Based on my findings I have decided to combine `Biography` Genre and `Animation`.
 
@@ -1208,5 +1208,6 @@ find_projects("Sobhita Dhulipala") |>
   facet_wrap(~is_biography)
 
 ```
-###VII.Nostalgia and Remakes
-###VIII.Putting It Together
+### VII.Nostalgia and Remakes
+
+### VIII.Putting It Together
