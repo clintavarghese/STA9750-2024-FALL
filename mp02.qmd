@@ -3,14 +3,17 @@ title: "mp2"
 editor: visual
 execute: 
   cache: true
-  code-fold: true 
+format:
+  html: 
+    code-link: true
 ---
 
 ### I.Introduction
 
 Hollywood has often used familiar strategies to attract audiences, like making movies based on real-life stories, adapting books or games, or working with popular intellectual properties. However, in recent years, movie theaters have seen fewer big box office hits, and audiences aren't flocking to see the latest films as they used to.
 
-This project aims to find new movie ideas by analyzing data from the Internet Movie Database (IMDb). By looking at what made past movies successful, identifying top actors and directors,popular genres.. we hope to give Hollywood executives useful insights for creating movies that can draw audiences back to theaters.
+This project aims to find new movie ideas by analyzing data from [the IMDb
+non-commercial release](https://datasets.imdbws.com/). By looking at what made past movies successful, identifying top actors and directors,popular genres.. we hope to give Hollywood executives useful insights for creating movies that can draw audiences back to theaters.
 
 ### II.Data Preparation
 
@@ -531,21 +534,21 @@ As seen from the above table, Breaking Bad ranks the first among the top ten TV 
 
 ::: callout 
 
-####Task 3
+#### Task 3
 :::
 >Design a ‘success’ measure for IMDb entries, reflecting both quality and broad popular awareness. 
->Implement your success metric using a mutate operator to add a new column to the TITLE_RATINGS table.
+Implement your success metric using a mutate operator to add a new column to the TITLE_RATINGS table.
 
 I created a new variable `new_rating` with Smoothing Formula:
->The new rating is calculated using a simple form of Bayesian average to account for the uncertainty in ratings with a low number of votes. The formula used is:
+The new rating is calculated using a simple form of Bayesian average to account for the uncertainty in ratings with a low number of votes. The formula used is:
 
 $$ new-rating=(averageRating×numVotes+1)/(numVotes+2) $$
 
 $$ new-rating= (numVotes+2)(averageRating×numVotes+1) $$
 
->The term averageRating \* numVotes gives the total sum of the ratings.
->Adding 1 to the numerator is a form of smoothing to slightly increase ratings with low votes. 
->Dividing by numVotes + 2 accounts for the additional "pseudo-votes" introduced by the smoothing factor.
+The term averageRating \* numVotes gives the total sum of the ratings.
+Adding 1 to the numerator is a form of smoothing to slightly increase ratings with low votes. 
+Dividing by numVotes + 2 accounts for the additional "pseudo-votes" introduced by the smoothing factor.
 
 ```{r}
 #| message: false 
