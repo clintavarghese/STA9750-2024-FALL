@@ -200,7 +200,7 @@ window.Quarto = {
 <section id="i.introduction" class="level3">
 <h3 class="anchored" data-anchor-id="i.introduction">I.Introduction</h3>
 <p>Hollywood has often used familiar strategies to attract audiences, like making movies based on real-life stories, adapting books or games, or working with popular intellectual properties. However, in recent years, movie theaters have seen fewer big box office hits, and audiences aren’t flocking to see the latest films as they used to.</p>
-<p>This project aims to find new movie ideas by analyzing data from the Internet Movie Database (IMDb). By looking at what made past movies successful, identifying top actors and directors, and learning from past failures, we hope to give Hollywood executives useful insights for creating movies that can draw audiences back to theaters.</p>
+<p>This project aims to find new movie ideas by analyzing data from the Internet Movie Database (IMDb). By looking at what made past movies successful, identifying top actors and directors,popular genres.. we hope to give Hollywood executives useful insights for creating movies that can draw audiences back to theaters.</p>
 </section>
 <section id="ii.data-preparation" class="level3">
 <h3 class="anchored" data-anchor-id="ii.data-preparation">II.Data Preparation</h3>
@@ -415,8 +415,8 @@ $ genre_cleaned  &lt;chr&gt; "Documentary", "Others", "Animation", "Others", "An
 </div>
 </section>
 </section>
-<section id="iii.initial-exploration" class="level3">
-<h3 class="anchored" data-anchor-id="iii.initial-exploration">III.Initial Exploration</h3>
+<section id="iii.-initial-exploration" class="level3">
+<h3 class="anchored" data-anchor-id="iii.-initial-exploration">III. Initial Exploration</h3>
 <div class="callout callout-style-simple callout-none no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1030,28 +1030,27 @@ Task 2: Instructor-Provided Questions
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="co">#|code-summary: "Show the code"</span></span>
-<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>success_decade<span class="ot">&lt;-</span>success_projects<span class="sc">|&gt;</span><span class="fu">identify_title</span>(<span class="st">"movie"</span>)<span class="sc">|&gt;</span><span class="fu">select</span>(startYear,primaryTitle,genre_cleaned)<span class="sc">|&gt;</span></span>
-<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(startYear)<span class="sc">|&gt;</span></span>
-<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>()<span class="sc">|&gt;</span></span>
-<span id="cb67-5"><a href="#cb67-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(genre_cleaned<span class="sc">!=</span><span class="st">"Others"</span>)</span>
-<span id="cb67-6"><a href="#cb67-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb67-7"><a href="#cb67-7" aria-hidden="true" tabindex="-1"></a>success_decade <span class="ot">&lt;-</span> success_decade <span class="sc">|&gt;</span> </span>
-<span id="cb67-8"><a href="#cb67-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">decade =</span> <span class="fu">case_when</span>(</span>
-<span id="cb67-9"><a href="#cb67-9" aria-hidden="true" tabindex="-1"></a>  startYear <span class="sc">&lt;</span> <span class="dv">1940</span> <span class="sc">~</span> <span class="st">"Before 1940"</span>,</span>
-<span id="cb67-10"><a href="#cb67-10" aria-hidden="true" tabindex="-1"></a>  startYear <span class="sc">&gt;=</span> <span class="dv">1940</span> <span class="sc">&amp;</span> startYear <span class="sc">&lt;</span> <span class="dv">1950</span> <span class="sc">~</span> <span class="st">"40's"</span>,</span>
-<span id="cb67-11"><a href="#cb67-11" aria-hidden="true" tabindex="-1"></a>  startYear <span class="sc">&gt;=</span> <span class="dv">1950</span> <span class="sc">&amp;</span> startYear <span class="sc">&lt;</span> <span class="dv">1960</span> <span class="sc">~</span> <span class="st">"50's"</span>,</span>
-<span id="cb67-12"><a href="#cb67-12" aria-hidden="true" tabindex="-1"></a>  startYear <span class="sc">&gt;=</span> <span class="dv">1960</span> <span class="sc">&amp;</span> startYear <span class="sc">&lt;</span> <span class="dv">1970</span> <span class="sc">~</span> <span class="st">"60's"</span>,</span>
-<span id="cb67-13"><a href="#cb67-13" aria-hidden="true" tabindex="-1"></a>  startYear <span class="sc">&gt;=</span> <span class="dv">1970</span> <span class="sc">&amp;</span> startYear <span class="sc">&lt;</span> <span class="dv">1980</span> <span class="sc">~</span> <span class="st">"70's"</span>,</span>
-<span id="cb67-14"><a href="#cb67-14" aria-hidden="true" tabindex="-1"></a>  startYear <span class="sc">&gt;=</span> <span class="dv">1980</span> <span class="sc">&amp;</span> startYear <span class="sc">&lt;</span> <span class="dv">1990</span> <span class="sc">~</span> <span class="st">"80's"</span>,</span>
-<span id="cb67-15"><a href="#cb67-15" aria-hidden="true" tabindex="-1"></a>  startYear <span class="sc">&gt;=</span> <span class="dv">1990</span> <span class="sc">&amp;</span> startYear <span class="sc">&lt;</span> <span class="dv">2000</span> <span class="sc">~</span> <span class="st">"90's"</span>,</span>
-<span id="cb67-16"><a href="#cb67-16" aria-hidden="true" tabindex="-1"></a>  startYear <span class="sc">&gt;=</span> <span class="dv">2000</span> <span class="sc">&amp;</span> startYear <span class="sc">&lt;</span> <span class="dv">2010</span> <span class="sc">~</span> <span class="st">"2000's"</span>,</span>
-<span id="cb67-17"><a href="#cb67-17" aria-hidden="true" tabindex="-1"></a>  startYear <span class="sc">&gt;=</span> <span class="dv">2010</span> <span class="sc">&amp;</span> startYear <span class="sc">&lt;</span> <span class="dv">2020</span> <span class="sc">~</span> <span class="st">"2010's"</span>,</span>
-<span id="cb67-18"><a href="#cb67-18" aria-hidden="true" tabindex="-1"></a>  startYear <span class="sc">&gt;=</span> <span class="dv">2020</span> <span class="sc">&amp;</span> startYear <span class="sc">&lt;</span> <span class="dv">2030</span> <span class="sc">~</span> <span class="st">"2020's"</span>,</span>
-<span id="cb67-19"><a href="#cb67-19" aria-hidden="true" tabindex="-1"></a>  <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"N/A"</span></span>
-<span id="cb67-20"><a href="#cb67-20" aria-hidden="true" tabindex="-1"></a>))<span class="sc">|&gt;</span><span class="fu">mutate</span>(<span class="at">decade =</span> <span class="fu">factor</span>(decade, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Before 1940"</span>, <span class="st">"40's"</span>, <span class="st">"50's"</span>, <span class="st">"60's"</span>, </span>
-<span id="cb67-21"><a href="#cb67-21" aria-hidden="true" tabindex="-1"></a>                                            <span class="st">"70's"</span>, <span class="st">"80's"</span>, <span class="st">"90's"</span>, <span class="st">"2000's"</span>, </span>
-<span id="cb67-22"><a href="#cb67-22" aria-hidden="true" tabindex="-1"></a>                                            <span class="st">"2010's"</span>, <span class="st">"2020's"</span>, <span class="st">"N/A"</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>success_decade<span class="ot">&lt;-</span>success_projects<span class="sc">|&gt;</span><span class="fu">identify_title</span>(<span class="st">"movie"</span>)<span class="sc">|&gt;</span><span class="fu">select</span>(startYear,primaryTitle,genre_cleaned)<span class="sc">|&gt;</span></span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(startYear)<span class="sc">|&gt;</span></span>
+<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>()<span class="sc">|&gt;</span></span>
+<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(genre_cleaned<span class="sc">!=</span><span class="st">"Others"</span>)</span>
+<span id="cb67-5"><a href="#cb67-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-6"><a href="#cb67-6" aria-hidden="true" tabindex="-1"></a>success_decade <span class="ot">&lt;-</span> success_decade <span class="sc">|&gt;</span> </span>
+<span id="cb67-7"><a href="#cb67-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">decade =</span> <span class="fu">case_when</span>(</span>
+<span id="cb67-8"><a href="#cb67-8" aria-hidden="true" tabindex="-1"></a>  startYear <span class="sc">&lt;</span> <span class="dv">1940</span> <span class="sc">~</span> <span class="st">"Before 1940"</span>,</span>
+<span id="cb67-9"><a href="#cb67-9" aria-hidden="true" tabindex="-1"></a>  startYear <span class="sc">&gt;=</span> <span class="dv">1940</span> <span class="sc">&amp;</span> startYear <span class="sc">&lt;</span> <span class="dv">1950</span> <span class="sc">~</span> <span class="st">"40's"</span>,</span>
+<span id="cb67-10"><a href="#cb67-10" aria-hidden="true" tabindex="-1"></a>  startYear <span class="sc">&gt;=</span> <span class="dv">1950</span> <span class="sc">&amp;</span> startYear <span class="sc">&lt;</span> <span class="dv">1960</span> <span class="sc">~</span> <span class="st">"50's"</span>,</span>
+<span id="cb67-11"><a href="#cb67-11" aria-hidden="true" tabindex="-1"></a>  startYear <span class="sc">&gt;=</span> <span class="dv">1960</span> <span class="sc">&amp;</span> startYear <span class="sc">&lt;</span> <span class="dv">1970</span> <span class="sc">~</span> <span class="st">"60's"</span>,</span>
+<span id="cb67-12"><a href="#cb67-12" aria-hidden="true" tabindex="-1"></a>  startYear <span class="sc">&gt;=</span> <span class="dv">1970</span> <span class="sc">&amp;</span> startYear <span class="sc">&lt;</span> <span class="dv">1980</span> <span class="sc">~</span> <span class="st">"70's"</span>,</span>
+<span id="cb67-13"><a href="#cb67-13" aria-hidden="true" tabindex="-1"></a>  startYear <span class="sc">&gt;=</span> <span class="dv">1980</span> <span class="sc">&amp;</span> startYear <span class="sc">&lt;</span> <span class="dv">1990</span> <span class="sc">~</span> <span class="st">"80's"</span>,</span>
+<span id="cb67-14"><a href="#cb67-14" aria-hidden="true" tabindex="-1"></a>  startYear <span class="sc">&gt;=</span> <span class="dv">1990</span> <span class="sc">&amp;</span> startYear <span class="sc">&lt;</span> <span class="dv">2000</span> <span class="sc">~</span> <span class="st">"90's"</span>,</span>
+<span id="cb67-15"><a href="#cb67-15" aria-hidden="true" tabindex="-1"></a>  startYear <span class="sc">&gt;=</span> <span class="dv">2000</span> <span class="sc">&amp;</span> startYear <span class="sc">&lt;</span> <span class="dv">2010</span> <span class="sc">~</span> <span class="st">"2000's"</span>,</span>
+<span id="cb67-16"><a href="#cb67-16" aria-hidden="true" tabindex="-1"></a>  startYear <span class="sc">&gt;=</span> <span class="dv">2010</span> <span class="sc">&amp;</span> startYear <span class="sc">&lt;</span> <span class="dv">2020</span> <span class="sc">~</span> <span class="st">"2010's"</span>,</span>
+<span id="cb67-17"><a href="#cb67-17" aria-hidden="true" tabindex="-1"></a>  startYear <span class="sc">&gt;=</span> <span class="dv">2020</span> <span class="sc">&amp;</span> startYear <span class="sc">&lt;</span> <span class="dv">2030</span> <span class="sc">~</span> <span class="st">"2020's"</span>,</span>
+<span id="cb67-18"><a href="#cb67-18" aria-hidden="true" tabindex="-1"></a>  <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"N/A"</span></span>
+<span id="cb67-19"><a href="#cb67-19" aria-hidden="true" tabindex="-1"></a>))<span class="sc">|&gt;</span><span class="fu">mutate</span>(<span class="at">decade =</span> <span class="fu">factor</span>(decade, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Before 1940"</span>, <span class="st">"40's"</span>, <span class="st">"50's"</span>, <span class="st">"60's"</span>, </span>
+<span id="cb67-20"><a href="#cb67-20" aria-hidden="true" tabindex="-1"></a>                                            <span class="st">"70's"</span>, <span class="st">"80's"</span>, <span class="st">"90's"</span>, <span class="st">"2000's"</span>, </span>
+<span id="cb67-21"><a href="#cb67-21" aria-hidden="true" tabindex="-1"></a>                                            <span class="st">"2010's"</span>, <span class="st">"2020's"</span>, <span class="st">"N/A"</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>The resulting cleaned dataset, <code>success_decade</code>, now contains distinct entries of successful movies with their corresponding start years and genres categorized by decade.</p>
@@ -1069,28 +1068,34 @@ Task 2: Instructor-Provided Questions
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="co">#|code-summary: "Show the code"</span></span>
-<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>success_decade <span class="sc">|&gt;</span></span>
-<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(decade, genre_cleaned) <span class="sc">|&gt;</span></span>
-<span id="cb69-4"><a href="#cb69-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">genre_count =</span> <span class="fu">n</span>(), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb69-5"><a href="#cb69-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
-<span id="cb69-6"><a href="#cb69-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(genre_cleaned,genre_count), <span class="at">y =</span>genre_count, <span class="at">fill =</span> genre_cleaned)) <span class="sc">+</span> </span>
-<span id="cb69-7"><a href="#cb69-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span>   <span class="co"># Use bars for better visualization</span></span>
-<span id="cb69-8"><a href="#cb69-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>decade, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span> </span>
-<span id="cb69-9"><a href="#cb69-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Facet by decade to see trends   </span></span>
-<span id="cb69-10"><a href="#cb69-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="st">"Genres"</span>,<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Documentary"</span> <span class="ot">=</span> <span class="st">"#1f77b4"</span>, <span class="st">"Comedy"</span> <span class="ot">=</span> <span class="st">"#ff7f0e"</span>, </span>
-<span id="cb69-11"><a href="#cb69-11" aria-hidden="true" tabindex="-1"></a>                               <span class="st">"Horror"</span> <span class="ot">=</span> <span class="st">"#2ca02c"</span>, <span class="st">"Action"</span> <span class="ot">=</span> <span class="st">"#d62728"</span>, </span>
-<span id="cb69-12"><a href="#cb69-12" aria-hidden="true" tabindex="-1"></a>                               <span class="st">"Adventure"</span> <span class="ot">=</span> <span class="st">"#9467bd"</span>, <span class="st">"Crime"</span> <span class="ot">=</span> <span class="st">"#8c564b"</span>, </span>
-<span id="cb69-13"><a href="#cb69-13" aria-hidden="true" tabindex="-1"></a>                               <span class="st">"Animation"</span> <span class="ot">=</span> <span class="st">"#e377c2"</span>, <span class="st">"Drama"</span> <span class="ot">=</span> <span class="st">"#7f7f7f"</span>, </span>
-<span id="cb69-14"><a href="#cb69-14" aria-hidden="true" tabindex="-1"></a>                               <span class="st">"Romance"</span> <span class="ot">=</span> <span class="st">"#bcbd22"</span>, <span class="st">"Sci-Fi"</span> <span class="ot">=</span> <span class="st">"#17becf"</span>,</span>
-<span id="cb69-15"><a href="#cb69-15" aria-hidden="true" tabindex="-1"></a>                               <span class="st">"Thriller"</span> <span class="ot">=</span> <span class="st">"#1ae4e2"</span>, <span class="st">"Biography"</span> <span class="ot">=</span> <span class="st">"#377eb8"</span>,</span>
-<span id="cb69-16"><a href="#cb69-16" aria-hidden="true" tabindex="-1"></a>                               <span class="st">"Musical"</span> <span class="ot">=</span> <span class="st">"#4daf4a"</span>))<span class="sc">+</span> <span class="co">#              # Use a color-blind-friendly palette</span></span>
-<span id="cb69-17"><a href="#cb69-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Number of Movies by Genre Across Decades"</span>,</span>
-<span id="cb69-18"><a href="#cb69-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Number of Movies"</span>, </span>
-<span id="cb69-19"><a href="#cb69-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Decade"</span>) <span class="sc">+</span></span>
-<span id="cb69-20"><a href="#cb69-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb69-21"><a href="#cb69-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>,<span class="at">size =</span> <span class="dv">6</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>success_decade <span class="sc">|&gt;</span></span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(decade, genre_cleaned) <span class="sc">|&gt;</span></span>
+<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">genre_count =</span> <span class="fu">n</span>(), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb69-4"><a href="#cb69-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb69-5"><a href="#cb69-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(genre_cleaned,genre_count), <span class="at">y =</span>genre_count, <span class="at">fill =</span> genre_cleaned)) <span class="sc">+</span> </span>
+<span id="cb69-6"><a href="#cb69-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span>   <span class="co"># Use bars for better visualization</span></span>
+<span id="cb69-7"><a href="#cb69-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>decade, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span> </span>
+<span id="cb69-8"><a href="#cb69-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Facet by decade to see trends   </span></span>
+<span id="cb69-9"><a href="#cb69-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="st">"Genres"</span>,<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Documentary"</span> <span class="ot">=</span> <span class="st">"#1f77b4"</span>, <span class="st">"Comedy"</span> <span class="ot">=</span> <span class="st">"#ff7f0e"</span>, </span>
+<span id="cb69-10"><a href="#cb69-10" aria-hidden="true" tabindex="-1"></a>                               <span class="st">"Horror"</span> <span class="ot">=</span> <span class="st">"#2ca02c"</span>, <span class="st">"Action"</span> <span class="ot">=</span> <span class="st">"#d62728"</span>, </span>
+<span id="cb69-11"><a href="#cb69-11" aria-hidden="true" tabindex="-1"></a>                               <span class="st">"Adventure"</span> <span class="ot">=</span> <span class="st">"#9467bd"</span>, <span class="st">"Crime"</span> <span class="ot">=</span> <span class="st">"#8c564b"</span>, </span>
+<span id="cb69-12"><a href="#cb69-12" aria-hidden="true" tabindex="-1"></a>                               <span class="st">"Animation"</span> <span class="ot">=</span> <span class="st">"#e377c2"</span>, <span class="st">"Drama"</span> <span class="ot">=</span> <span class="st">"#7f7f7f"</span>, </span>
+<span id="cb69-13"><a href="#cb69-13" aria-hidden="true" tabindex="-1"></a>                               <span class="st">"Romance"</span> <span class="ot">=</span> <span class="st">"#bcbd22"</span>, <span class="st">"Sci-Fi"</span> <span class="ot">=</span> <span class="st">"#17becf"</span>,</span>
+<span id="cb69-14"><a href="#cb69-14" aria-hidden="true" tabindex="-1"></a>                               <span class="st">"Thriller"</span> <span class="ot">=</span> <span class="st">"#1ae4e2"</span>, <span class="st">"Biography"</span> <span class="ot">=</span> <span class="st">"#377eb8"</span>,</span>
+<span id="cb69-15"><a href="#cb69-15" aria-hidden="true" tabindex="-1"></a>                               <span class="st">"Musical"</span> <span class="ot">=</span> <span class="st">"#4daf4a"</span>))<span class="sc">+</span> <span class="co">#              # Use a color-blind-friendly palette</span></span>
+<span id="cb69-16"><a href="#cb69-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Number of Movies by Genre Across Decades"</span>,</span>
+<span id="cb69-17"><a href="#cb69-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Number of Movies"</span>, </span>
+<span id="cb69-18"><a href="#cb69-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Decade"</span>) <span class="sc">+</span></span>
+<span id="cb69-19"><a href="#cb69-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb69-20"><a href="#cb69-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>,<span class="at">size =</span> <span class="dv">6</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mp02_files/figure-html/No of Movies Based on Genres-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>success_decade <span class="sc">|&gt;</span></span>
@@ -1318,7 +1323,9 @@ Task 2: Instructor-Provided Questions
 </div>
 </div>
 <p>From this graph, we could identify that <code>Dramas</code>,<code>Comedy</code>,<code>Action</code>,<code>Adventure</code>, <code>Crime</code> have been always popular. However, there is a good amount attention being given for <code>Biography</code> and <code>Animations</code> in recent years.</p>
-<p>###VI.Successful Personnel in the Genre</p>
+</section>
+<section id="vi.successful-personnel-in-the-genre" class="level3">
+<h3 class="anchored" data-anchor-id="vi.successful-personnel-in-the-genre">VI.Successful Personnel in the Genre</h3>
 <p>Based on my findings I have decided to combine <code>Biography</code> Genre and <code>Animation</code>.</p>
 <p>We focus on the <code>Biography</code> genre to identify high-quality films. The process begins by filtering the <code>ALL_TITLES</code> dataset to select only movies categorized under the <code>Biography</code> genre. The distinct function is used to ensure that each movie is represented only once in the resulting dataset.</p>
 <div class="cell">
@@ -1484,10 +1491,15 @@ summarize(count=n(),.groups="drop",ratings=mean(new_rating))|&gt;arrange(desc(de
   ) + 
   facet_wrap(~is_biography)
 </code></pre>
-<p>###VII.Nostalgia and Remakes ###VIII.Putting It Together</p>
-
-
 </section>
+</section>
+<section id="vii.nostalgia-and-remakes" class="level3">
+<h3 class="anchored" data-anchor-id="vii.nostalgia-and-remakes">VII.Nostalgia and Remakes</h3>
+</section>
+<section id="viii.putting-it-together" class="level3">
+<h3 class="anchored" data-anchor-id="viii.putting-it-together">VIII.Putting It Together</h3>
+
+
 </section>
 
 </main> <!-- /main -->

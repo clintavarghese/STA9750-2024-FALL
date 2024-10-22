@@ -769,7 +769,6 @@ A new column, `decade`, was created based on the `startYear`. This column catego
 #| warning: false
 #| cache: false
 #| code-fold: true
-#|code-summary: "Show the code"
 success_decade<-success_projects|>identify_title("movie")|>select(startYear,primaryTitle,genre_cleaned)|>
   arrange(startYear)|>
   distinct()|>
@@ -806,12 +805,10 @@ sample_n(success_decade,100)|>DT::datatable()
 
 ```{r}
 #| label: 'No of Movies Based on Genres'
-#| eval: false
 #| message: false 
 #| warning: false
 #| cache: false
 #| code-fold: true
-#|code-summary: "Show the code"
 success_decade |>
   group_by(decade, genre_cleaned) |>
   summarize(genre_count = n(), .groups = "drop") |>
@@ -833,6 +830,8 @@ success_decade |>
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1,size = 6))
 ```
+
+
 ```{r}
 success_decade |>
   group_by(decade, genre_cleaned) |>
