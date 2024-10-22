@@ -21,6 +21,10 @@ The following packages are used for this analysis: `dplyr`, `tidyr`, `DT`, `ggpl
 To begin, we load the necessary R libraries, primarily using the `tidyverse` package for data wrangling and `DT` for data visualization.
 
 ```{r echo=TRUE,warning=FALSE,message=FALSE}
+#| message: false 
+#| warning: false
+#| cache: true
+#| code-fold: true
 if(!require("ggplot2")) install.packages("ggplot2")
 if (!require("tidyverse")) install.packages("tidyverse")
 if (!require("DT")) install.packages("DT")
@@ -32,7 +36,9 @@ library(ggplot2)
 I have also created a function for interactive table creation
 
 ```{r echo=TRUE}
-
+#| message: false 
+#| warning: false
+#| code-fold: true
 table_creation<-function(x){
   datatable(x, 
             options = list(
@@ -50,6 +56,7 @@ table_creation<-function(x){
 #### 2.Data Loading
 
 ```{r echo=TRUE}
+#| code-fold: true
 get_imdb_file <- function(fname){
     BASE_URL <- "https://datasets.imdbws.com/"
     fname_ext <- paste0(fname, ".tsv.gz")
@@ -68,9 +75,17 @@ get_imdb_file <- function(fname){
 #| message: false 
 #| warning: false
 #| cache: true
+#| code-fold: true
 NAME_BASICS <- get_imdb_file("name.basics")
-write.csv(NAME_BASICS, "~/STA9750-2024-FALL/NAME_BASICS.csv",row.names=TRUE,col.names = TRUE )
+#write.csv(NAME_BASICS, "~/STA9750-2024-FALL/NAME_BASICS.csv",row.names=TRUE,col.names = TRUE )
+
 ```
+
+```{r echo=FALSE}
+#|cache: false
+NAME_BASICS<-read.csv( "~/STA9750-2024-FALL/NAME_BASICS.csv")
+```
+
 
 ```{r  echo=TRUE,show_col_types = FALSE, warning=FALSE}
 #| label: 'imdb_Title_basics'
@@ -78,9 +93,16 @@ write.csv(NAME_BASICS, "~/STA9750-2024-FALL/NAME_BASICS.csv",row.names=TRUE,col.
 #| message: false 
 #| warning: false
 #| cache: true
+#| code-fold: true
 
 TITLE_BASICS<- get_imdb_file("title.basics")
-write.csv(TITLE_BASICS, "~/STA9750-2024-FALL/TITLE_BASICS.csv",row.names=TRUE,col.names = TRUE )
+#write.csv(TITLE_BASICS, "~/STA9750-2024-FALL/TITLE_BASICS.csv",row.names=TRUE,col.names = TRUE )
+```
+
+
+```{r echo=FALSE}
+#|cache: false
+TITLE_BASICS<-read.csv( "~/STA9750-2024-FALL/TITLE_BASICS.csv")
 ```
 
 ```{r  echo=TRUE}
@@ -88,9 +110,15 @@ write.csv(TITLE_BASICS, "~/STA9750-2024-FALL/TITLE_BASICS.csv",row.names=TRUE,co
 #| eval: false
 #| message: false 
 #| warning: false
+#| code-fold: true
 
 TITLE_EPISODES   <- get_imdb_file("title.episode")
 write.csv(TITLE_EPISODES, "~/STA9750-2024-FALL/TITLE_EPISODES.csv",row.names=TRUE,col.names = TRUE )
+```
+
+```{r echo=FALSE}
+#|cache: false
+TITLE_EPISODES<-read.csv( "~/STA9750-2024-FALL/TITLE_EPISODES.csv")
 ```
 
 ```{r echo=TRUE}
@@ -98,10 +126,16 @@ write.csv(TITLE_EPISODES, "~/STA9750-2024-FALL/TITLE_EPISODES.csv",row.names=TRU
 #| eval: false
 #| message: false 
 #| warning: false
-#| cache: true
+#| cache: false
 TITLE_RATINGS    <- get_imdb_file("title.ratings")
-write.csv(TITLE_RATINGS, "~/STA9750-2024-FALL/TITLE_RATINGS.csv",row.names=TRUE,col.names = TRUE )
 
+
+```
+
+```{r echo=FALSE}
+#|cache: false
+TITLE_RATINGS<-read.csv( "~/STA9750-2024-FALL/TITLE_RATINGS.csv")
+#write.csv(TITLE_RATINGS, "~/STA9750-2024-FALL/TITLE_RATINGS.csv",row.names=TRUE,col.names = TRUE )
 ```
 
 ```{r show_col_types = FALSE, echo=TRUE}
@@ -110,8 +144,15 @@ write.csv(TITLE_RATINGS, "~/STA9750-2024-FALL/TITLE_RATINGS.csv",row.names=TRUE,
 #| message: false 
 #| warning: false
 #| cache: true
+#| code-fold: true
 TITLE_CREW       <- get_imdb_file("title.crew")
-write.csv(TITLE_CREW, "~/STA9750-2024-FALL/TITLE_CREW.csv",row.names=TRUE,col.names = TRUE )
+
+```
+
+```{r echo=FALSE}
+#|cache: false
+#write.csv(TITLE_CREW, "~/STA9750-2024-FALL/TITLE_CREW.csv",row.names=TRUE,col.names = TRUE )
+TITLE_CREW<-read.csv( "~/STA9750-2024-FALL/TITLE_CREW.csv")
 ```
 
 ```{r echo=TRUE}
@@ -120,15 +161,17 @@ write.csv(TITLE_CREW, "~/STA9750-2024-FALL/TITLE_CREW.csv",row.names=TRUE,col.na
 #| message: false 
 #| warning: false
 #| cache: true
-#TITLE_PRINCIPALS <- get_imdb_file("title.principals")
-#TITLE_PRINCIPALS<-as.data.frame(readr::read_tsv("~/STA9750-2024-FALL/title.principals.tsv.gz", lazy=FALSE))
-#dat <- vroom(title.principals)
-#problems(dat)
+#| code-fold: true
+TITLE_PRINCIPALS <- get_imdb_file("title.principals")
 
-#write.csv(TITLE_PRINCIPALS, "~/STA9750-2024-FALL/TITLE_PRINCIPALS.csv",row.names=TRUE,col.names = TRUE )
 
+
+```
+
+```{r echo=FALSE}
+#|cache: false
 TITLE_PRINCIPALS1<-read.csv( "~/STA9750-2024-FALL/TITLE_PRINCIPALS.csv")
-
+#write.csv(TITLE_PRINCIPALS, "~/STA9750-2024-FALL/TITLE_PRINCIPALS.csv",row.names=TRUE,col.names = TRUE )
 ```
 
 #### 3.Data Sub-Sampling
@@ -136,12 +179,16 @@ TITLE_PRINCIPALS1<-read.csv( "~/STA9750-2024-FALL/TITLE_PRINCIPALS.csv")
 For our NAME_BASICS table, we’ll restrict our attention to people with at least two “known for” credits.
 
 ```{r echo=TRUE}
-
+glimpse(NAME_BASICS)
 NAME_BASICS <- NAME_BASICS |> 
     filter(str_count(knownForTitles, ",") > 1)
+
 ```
 
 ```{r echo=TRUE}
+#| message: false 
+#| warning: false
+#| code-fold: true
 TITLE_RATINGS |>
     ggplot(aes(x=numVotes)) + 
     geom_histogram(bins=30) +
@@ -154,26 +201,40 @@ TITLE_RATINGS |>
 ```
 
 ```{r echo=TRUE}
+#| message: false 
+#| warning: false
+#| code-fold: true
 TITLE_RATINGS |>
     pull(numVotes) |>
     quantile()
 ```
 
 ```{r echo=TRUE}
-
+#| message: false 
+#| warning: false
+#| code-fold: true
 TITLE_RATINGS <- TITLE_RATINGS |>
     filter(numVotes >= 100)
 ```
 
 ```{r}
+#| message: false 
+#| warning: false
+#| code-fold: true
 glimpse(NAME_BASICS)
 ```
 
 ```{r}
+#| message: false 
+#| warning: false
+#| code-fold: true
 glimpse(TITLE_BASICS)
 ```
 
 ```{r echo=TRUE}
+#| message: false 
+#| warning: false
+#| code-fold: true
 TITLE_BASICS <- TITLE_BASICS |>
     semi_join(TITLE_RATINGS, 
               join_by(tconst == tconst))
@@ -199,11 +260,15 @@ TITLE_PRINCIPALS1 <- TITLE_PRINCIPALS1 |> semi_join(TITLE_RATINGS, join_by(tcons
 
 ```
 ### III.Initial Exploration
-::: Call-out
+::: callout
 #### Task 1: Column Type Correction
->Correct the column types of the TITLE tables using a combination of mutate and the coercion functions as.numeric and as.logical..
+:::
+Correct the column types of the TITLE tables using a combination of mutate and the coercion functions as.numeric and as.logical..
 
 ```{r warning=FALSE}
+#| message: false 
+#| warning: false
+#| code-fold: true
 TITLE_BASICS <- TITLE_BASICS |>
     mutate(startYear = as.numeric(startYear))
 TITLE_BASICS<-TITLE_BASICS |> separate_longer_delim(genres, ",") 
@@ -211,6 +276,9 @@ glimpse(TITLE_BASICS)
 ```
 
 ```{r echo=TRUE}
+#| message: false 
+#| warning: false
+#| code-fold: true
 relevant_genres <- c("Action", "Comedy", "Drama", "Horror", "Romance", "Thriller", "Adventure", "Animation", "Biography", "Crime", "Documentary","Musical","Romance","Sci-Fi")
 
 TITLE_BASICS <- TITLE_BASICS |>
@@ -221,6 +289,9 @@ TITLE_BASICS <- TITLE_BASICS |>
 ```
 
 ```{r warning=FALSE}
+#| message: false 
+#| warning: false
+#| code-fold: true
 NAME_BASICS <- NAME_BASICS |>
     mutate(birthYear = as.numeric(birthYear),
            deathYear = as.numeric(deathYear))
@@ -228,12 +299,18 @@ glimpse(NAME_BASICS)
 ```
 
 ```{r}
+#| message: false 
+#| warning: false
+#| code-fold: true
 
 TITLE_CREW<-TITLE_CREW |> separate_longer_delim(directors, ",")
 glimpse(TITLE_CREW)
 ```
 
 ```{r}
+#| message: false 
+#| warning: false
+#| code-fold: true
 glimpse(TITLE_EPISODES)
 TITLE_EPISODES<-TITLE_EPISODES|>mutate(
             seasonNumber=as.numeric(seasonNumber),
@@ -241,27 +318,38 @@ TITLE_EPISODES<-TITLE_EPISODES|>mutate(
 ```
 
 ```{r}
+#| message: false 
+#| warning: false
+#| code-fold: true
 glimpse(TITLE_PRINCIPALS1)
 ```
 
 ```{r}
+#| message: false 
+#| warning: false
+#| code-fold: true
 glimpse(TITLE_RATINGS)
 ```
-:::
 
-::: Call-out 
-#### Task 2: Instructor-Provided Questions 
+
+::: callout 
+#### Task 2: Instructor-Provided Questions
+:::
 >1.How many movies are in our data set? How many TV series? How many TV episodes?
 
 ```{r}
-
+#| message: false 
+#| warning: false
+#| code-fold: true
 table(TITLE_BASICS$titleType)
 ```
 
 I write a function`count_title` to identify the project type and count.
 
 ```{r echo=TRUE}
-
+#| message: false 
+#| warning: false
+#| code-fold: true
 count_title<-function(x){
   word<-x
   count<-sum(grepl(word,TITLE_BASICS$titleType,ignore.case = TRUE))
@@ -270,6 +358,9 @@ count_title<-function(x){
 ```
 
 ```{r}
+#| message: false 
+#| warning: false
+#| code-fold: true
 movie_count<-count_title("movie")
 series_count<-count_title("series")
 episode_count<-count_title("episode")
@@ -281,6 +372,9 @@ print(paste0("There are ", movie_count, " movies, ", series_count, " series and 
 According to [wikipedia](https://en.wikipedia.org/wiki/List_of_oldest_living_people), the oldest person alive in the world is of 1908 onwards. Hence, I keep checked for people who are born on 1908 and afterwards, and who doesn't a death year
 
 ```{r echo=TRUE}
+#| message: false 
+#| warning: false
+#| code-fold: true
 NAME_BASICS|>select(-knownForTitles)|>
   filter(birthYear==1908, is.na(deathYear))|>
   distinct(primaryName, .keep_all = TRUE)|>select(primaryName,primaryProfession)|>DT::datatable()
@@ -291,6 +385,9 @@ There are 111 individuals who were born in the year 1911.
 >3.There is one TV Episode in this data set with a perfect 10/10 rating and 200,000 IMDb ratings. What is it? What series does it belong to?
 
 ```{r echo=TRUE}
+#| message: false 
+#| warning: false
+#| code-fold: true
 library(DT)
 
 perfect_episode<-TITLE_RATINGS|>filter(averageRating==10.0,numVotes>=200000)
@@ -312,6 +409,9 @@ I began by joining the `TITLE_RATINGS` and `TITLE_EPISODES` datasets to create `
 Next, I merged these two datasets into `TITLE_RATING_EPISODE`, arranged it by descending averageRating and numVotes, and removed duplicate entries to get a clean dataset for further analysis.
 
 ```{r echo=TRUE}
+#| message: false 
+#| warning: false
+#| code-fold: true
 
 library(tidyverse)
 TITLE_BASICS_RATING_1<-full_join(TITLE_RATINGS,TITLE_EPISODES|>select(tconst),by=c("tconst" = "tconst"))
@@ -398,6 +498,9 @@ find_projects<-function(actor_or_director){
 ```
 
 ```{r}
+#| message: false 
+#| warning: false
+#| code-fold: true
 name="Mark Hamill"
 find_projects(name)|>select(primaryTitle,averageRating,numVotes)|>distinct()|>
   arrange(desc(numVotes),desc(averageRating))|>slice(1:75)|>DT::datatable()
@@ -408,32 +511,46 @@ Based on the above analysis and functions, we find that Mark Hamill is famously 
 >5.What TV series, with more than 12 episodes, has the highest average rating?
 
 ```{r echo=TRUE}
-
+#| message: false 
+#| warning: false
+#| code-fold: true
 
 SERIES<-right_join(ALL_TITLES,TITLE_EPISODES|>filter(episodeNumber>12)|>distinct(parentTconst,.keep_all = TRUE)|>select(-tconst),by=c("tconst"="parentTconst"))
 ```
 
 ```{r echo=TRUE}
+#| message: false 
+#| warning: false
+#| code-fold: true
 SERIES|>arrange(desc(numVotes),desc(averageRating))|>select(primaryTitle,averageRating,numVotes)|>distinct()|>slice(1:10)
 ```
 
 As seen from the above table, Breaking Bad ranks the first among the top ten TV series, that has the highest number of votes and rated well by the critics. It deserves to be rated as the highest because of the thrilling intensity, it gives the viewers as well as the way they show each of the character development and growth through each of the episode and season.
-:::
+
 ### IV. Quantifying Success
 
-::: Call-out 
+::: callout 
+
 ####Task 3
->Design a ‘success’ measure for IMDb entries, reflecting both quality and broad popular awareness. Implement your success metric using a mutate operator to add a new column to the TITLE_RATINGS table.
+:::
+>Design a ‘success’ measure for IMDb entries, reflecting both quality and broad popular awareness. 
+>Implement your success metric using a mutate operator to add a new column to the TITLE_RATINGS table.
 
-I created a new variable `new_rating` with Smoothing Formula: The new rating is calculated using a simple form of Bayesian average to account for the uncertainty in ratings with a low number of votes. The formula used is:
+I created a new variable `new_rating` with Smoothing Formula:
+>The new rating is calculated using a simple form of Bayesian average to account for the uncertainty in ratings with a low number of votes. The formula used is:
 
-$$ new_rating=(averageRating×numVotes+1)/(numVotes+2) $$
+$$ new-rating=(averageRating×numVotes+1)/(numVotes+2) $$
 
-$$ new_rating= (numVotes+2)(averageRating×numVotes+1) $$
+$$ new-rating= (numVotes+2)(averageRating×numVotes+1) $$
 
-The term averageRating \* numVotes gives the total sum of the ratings. Adding 1 to the numerator is a form of smoothing to slightly increase ratings with low votes. Dividing by numVotes + 2 accounts for the additional "pseudo-votes" introduced by the smoothing factor.
+>The term averageRating \* numVotes gives the total sum of the ratings.
+>Adding 1 to the numerator is a form of smoothing to slightly increase ratings with low votes. 
+>Dividing by numVotes + 2 accounts for the additional "pseudo-votes" introduced by the smoothing factor.
 
 ```{r}
+#| message: false 
+#| warning: false
+#| code-fold: true
 ALL_TITLES<-ALL_TITLES|>mutate(new_rating=round((averageRating*numVotes+1)/(numVotes+2),3))
 ```
 >1.Choose the top 5-10 movies on your metric and confirm that they were indeed box office successes.
@@ -441,6 +558,9 @@ ALL_TITLES<-ALL_TITLES|>mutate(new_rating=round((averageRating*numVotes+1)/(numV
 I used the function `identify_title` to filter movies
 
 ```{r echo=TRUE}
+#| message: false 
+#| warning: false
+#| code-fold: true
 identify_title<-function(df,word){
   x<-df|>filter(grepl(word,titleType,ignore.case = TRUE))
   return(x)                     
@@ -451,6 +571,9 @@ identify_title<-function(df,word){
 `highest_top_50` function was developed to identify and retrieve the top 50 movies based on the number of votes and ratings. This function takes a dataframe as input, arranges the data in descending order by `numVotes` and `new_rating`, and returns the top 50 entries while excluding the columns `averageRating`, `tconst`, and `titleType` from the output. Next, the dataset `movies_rated` was generated by using the `identify_title` function to filter movie titles from the `ALL_TITLES` dataset, ensuring only distinct rows were included, and removing the `genre_cleaned` column. The `highest_top_50` function was then applied to this dataset, and the result was passed to the `table_creation` function, which produced an interactive table using the `DT` package to display the top 50 movies based on votes and ratings.
 
 ```{r echo=TRUE}
+#| message: false 
+#| warning: false
+#| code-fold: true
 highest_top_50<-function(df)
 {
   df|>
@@ -461,6 +584,9 @@ highest_top_50<-function(df)
 ```
 
 ```{r}
+#| message: false 
+#| warning: false
+#| code-fold: true
 library(DT)
 movies_rated<-identify_title(ALL_TITLES,"movie")
 table_creation(highest_top_50(movies_rated|>select(-genre_cleaned)|>distinct()))
@@ -473,6 +599,9 @@ table_creation(highest_top_50(movies_rated|>select(-genre_cleaned)|>distinct()))
 To identify movies with a large number of IMDb votes but poor performance on the success metric, I sorted the movies_rated dataset by descending order of numVotes and filtered for movies with a new_rating of less than 5. The following code selects the top 10 movies fitting this criterion and excludes the columns tconst and titleType:
 
 ```{r echo=TRUE}
+#| message: false 
+#| warning: false
+#| code-fold: true
 # Sort by the new rating
 table_creation(movies_rated |> 
     arrange(desc(numVotes)) |> 
@@ -484,7 +613,9 @@ table_creation(movies_rated |>
 >3.Choose a prestige actor or director and confirm that they have many projects with high scores on your success metric.
 
 ```{r}
-
+#| message: false 
+#| warning: false
+#| code-fold: true
 library(dplyr)
 # Function to get user input and find their projects
 #name <- readline(prompt = "Enter the actor or director name:")
@@ -548,6 +679,9 @@ projects1 |>
 The `Genres` column has multiple values, hence cleaning it a bit.
 
 ```{r}
+#| message: false 
+#| warning: false
+#| code-fold: true
  summary(ALL_TITLES$numVotes)
 
 ```
@@ -557,11 +691,17 @@ The data appeared right-skewed, indicating that most movies had relatively low v
 To better analyze the data, I arranged the `ALL_TITLES` dataset by both `numVotes` and `new_rating`. I then divided the dataset into four quantiles based on the `numVotes` using the `ntile function`. This categorization allows for better comparison among movies with varying vote counts.
 
 ```{r echo=FALSE}
+#| message: false 
+#| warning: false
+#| code-fold: true
 ALL_TITLES <- ALL_TITLES|> arrange(numVotes,new_rating)|>
   mutate(vote_quantile = ntile(numVotes, 4))  
 ```
 I created a density plot using ggplot2 to visualize the distribution of new_rating across the different vote quantiles. This visual representation helps identify how ratings are distributed in relation to the number of votes, offering insight into which movies are considered "solid" based on their vote counts.
 ```{r echo=TRUE}
+#| message: false 
+#| warning: false
+#| code-fold: true
 ggplot(ALL_TITLES, aes(x = new_rating, fill = factor(vote_quantile))) +
   geom_density(alpha = 0.6) +
   labs(title = "Density of Ratings by Vote Quantile",
@@ -574,6 +714,9 @@ ggplot(ALL_TITLES, aes(x = new_rating, fill = factor(vote_quantile))) +
 I defined a success metric in the dataset by creating a new column, `success_metrics`. Movies are assigned a value of `1` if they fall into the` highest vote quantile (quantile 4) and have a new_rating greater than the median new_rating`. Otherwise, they are assigned a value of 0. This approach helps categorize movies as "successful" or "not successful" based on a combination of their rating and the number of votes they received.
 
 ```{r}
+#| message: false 
+#| warning: false
+#| code-fold: true
 ALL_TITLES <- ALL_TITLES |>
   mutate(success_metrics = case_when(
     new_rating > median(new_rating) & vote_quantile==4 ~ 1,
@@ -584,27 +727,36 @@ rm(TITLE_EPISODES_2)
 
 
 ```{r}
+#| message: false 
+#| warning: false
+#| code-fold: true
 sample_n(ALL_TITLES,100)|>DT::datatable()
 ```
-:::
+
 
 ###Examining Success by Genre and Decade
 
-::: Call-out 
+::: callout 
 ####Task 4
-
+:::
 >1.What was the genre with the most “successes” in each decade? 
 
 I filtered the `ALL_TITLES` dataset to create a new dataset called `success_project`s, containing only the titles marked as successful (where `success_metrics equals 1`). This dataset was then prepared for further analysis.
 I also ensured the `startYear` column was numeric for accurate processing and examined a sample of successful projects.
 
 ```{r echo=TRUE}
+#| message: false 
+#| warning: false
+#| code-fold: true
 success_projects=ALL_TITLES|>filter(success_metrics==1)|> 
   mutate(startYear = as.numeric(startYear))
 sample_n(success_projects,100)|>DT::datatable()
 ```
 
 ```{r}
+#| message: false 
+#| warning: false
+#| code-fold: true
 summary(success_projects$startYear)
 ```
 
@@ -613,7 +765,6 @@ A new column, `decade`, was created based on the `startYear`. This column catego
 
 ```{r echo=TRUE}
 #| label: 'successful projects based decade'
-#| eval: false
 #| message: false 
 #| warning: false
 #| cache: false
@@ -646,6 +797,9 @@ success_decade <- success_decade |>
 The resulting cleaned dataset, `success_decade`, now contains distinct entries of successful movies with their corresponding start years and genres categorized by decade.
 
 ```{r echo=TRUE}
+#| message: false 
+#| warning: false
+#| code-fold: true
 library(tidyverse)
 sample_n(success_decade,100)|>DT::datatable()
 ```
@@ -694,7 +848,9 @@ It is `Drama` category is been the most successes in all decades.
 To analyze the trends in movie genres over time regarding their success, we can examine the average ratings by genre for each decade. This will help us identify which genre has consistently had the most successes and which genre has fallen out of favor over the years.
 
 ```{r echo=TRUE}
-
+#| message: false 
+#| warning: false
+#| code-fold: true
 ALL_TITLES <- ALL_TITLES|> mutate(decade = case_when(
   startYear < 1940 ~ "Before 1940",
   startYear >= 1940 & startYear < 1950 ~ "40's",
@@ -731,6 +887,9 @@ I then created a new dataset, `ALL_MOVIES`, which consists of  movie titles alon
 I calculated the `average rating for each genre per decade` and `filtered out the 2020s` to focus on earlier trends.
 This summary provides insight into how each genre performed over the decades.
 ```{r}
+#| message: false 
+#| warning: false
+#| code-fold: true
 
 # Calculate average rating per genre per decade
 ALL_MOVIES |>
@@ -763,6 +922,9 @@ Throughout the decades, Drama has emerged as a dominant genre, enjoying sustaine
 
 The analysis reveals the total number of successes for each genre within the specified time frame. By grouping the data by genre_cleaned and success_metrics, we determined how many projects in each genre were classified as successful (success_metrics = 1) compared to non-successful (success_metrics = 0).
 ```{r}
+#| message: false 
+#| warning: false
+#| code-fold: true
 # Load necessary library for text annotations
 library(scales)
 
@@ -777,6 +939,9 @@ x|>DT::datatable()
 ```
 
 ```{r echo=TRUE}
+#| message: false 
+#| warning: false
+#| code-fold: true
 # Create the plot
 ggplot(x, aes(x = reorder(genre_cleaned,total), y=total,fill=as.factor(success_metrics))) +
   geom_bar(stat = "identity", position = "stack") +  # Bars are dodged side-by-side for success_metrics
@@ -791,7 +956,9 @@ ggplot(x, aes(x = reorder(genre_cleaned,total), y=total,fill=as.factor(success_m
 At a glance, the analysis indicates that the `Drama` genre has produced the most successful projects since 2010, followed closely by `Comedy` and `Thriller`. However, when we examine the success rate by considering the ratio of successful projects to the total number of projects within each genre, the results shift significantly.
 
 ```{r echo=TRUE}
-
+#| message: false 
+#| warning: false
+#| code-fold: true
 # Create the plot
 ggplot(x|>filter(success_metrics==1), aes(x = reorder(genre_cleaned,percentage), y=percentage,fill=genre_cleaned)) +
   geom_bar(stat = "identity", position = "dodge") +  # Bars are dodged side-by-side for success_metrics
@@ -821,6 +988,9 @@ The disparity between the total number of successful projects in `Drama`, `Comed
 >4.What genre has become more popular in recent years?
 
 ```{r}
+#| message: false 
+#| warning: false
+#| code-fold: true
 if (!require("gganimate")) install.packages("gganimate")
 library(gganimate)
 if (!require("scales")) install.packages("scales")
@@ -830,6 +1000,9 @@ library(zoo)
 ```
 
 ```{r}
+#| message: false 
+#| warning: false
+#| code-fold: true
 years <- seq(from = 1950, to = 2020, by = 1)
 years_df <- data.frame(startYear = years)
 ALL_MOVIES<-ALL_MOVIES|>mutate(startYear=as.numeric(startYear))
@@ -845,7 +1018,9 @@ if (!dir.exists(output_dir)) {
 ```
 
 ```{r}
-
+#| message: false 
+#| warning: false
+#| code-fold: true
 ALL_MOVIES_1$startYear <- na.approx(ALL_MOVIES_1$startYear)  
 anim <- ALL_MOVIES_1 |>
   filter(startYear > 1950) |>
@@ -867,7 +1042,7 @@ anim <- ALL_MOVIES_1 |>
 ```
 
 From this graph, we could identify that `Dramas`,`Comedy`,`Action`,`Adventure`, `Crime` have been always popular. However, there is a good amount attention being given for `Biography` and `Animations` in recent years.
-:::
+
 
 ###VI.Successful Personnel in the Genre
 
@@ -876,6 +1051,9 @@ Based on my findings I have decided to combine `Biography` Genre and `Animation`
 We focus on the `Biography` genre to identify high-quality films. The process begins by filtering the `ALL_TITLES` dataset to select only movies categorized under the `Biography` genre. The distinct function is used to ensure that each movie is represented only once in the resulting dataset.
 
 ```{r}
+#| message: false 
+#| warning: false
+#| code-fold: true
 bio_anime_movies<-ALL_TITLES|>identify_title("movie")|>filter( genre_cleaned%in% c("Biography","Animation"))|>distinct()
 
 bio_anime_movies <- bio_anime_movies |>filter(vote_quantile>3)|>select(-averageRating,-startYear)|>
@@ -883,17 +1061,26 @@ bio_anime_movies <- bio_anime_movies |>filter(vote_quantile>3)|>select(-averageR
   distinct()
 sample_n(bio_anime_movies,100)|>DT::datatable()
 ```
-####Task 5:
+
+
+#### Task 5:
+
+
 >Identify (at least) two actors and one director who you will target as the key talent for your movie. Write a short “pitch” as to why they are likely to be successful. You should support your pitch with at least one graphic and one table.
 
 ```{r}
+#| message: false 
+#| warning: false
+#| code-fold: true
 bio_anime_movies|>select(primaryName,primaryTitle)|>distinct()|>
   group_by(primaryName)|>
   summarize(count=n())|>ungroup()|>arrange(desc(count))
 ```
 
 ```{r}
-
+#| message: false 
+#| warning: false
+#| code-fold: true
 find_projects("Mary Hidalgo")|>identify_title("movie")|> mutate(is_animation = ifelse(genre_cleaned %in% c("Animation","Biography"), 1, 0))|>select(new_rating,numVotes,is_animation,genre_cleaned)|>
   ggplot(aes(x = new_rating, y = genre_cleaned, color = as.factor(is_animation))) +
  geom_boxplot() +  # Adjust shape for filled points
@@ -910,7 +1097,11 @@ find_projects("Mary Hidalgo")|>identify_title("movie")|> mutate(is_animation = i
 
   
 ```
+
 ```{r}
+#| message: false 
+#| warning: false
+#| code-fold: true
 find_projects("Mary Hidalgo")|>identify_title("movie")|>select(-titleType,-tconst)|>filter(success_metrics==1,genre_cleaned %in% c("Biography","Animation"))|>DT::datatable()
 ```
 She has a lot of box office hits.
