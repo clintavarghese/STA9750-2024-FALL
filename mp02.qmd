@@ -8,12 +8,15 @@ format:
     code-link: true
 ---
 
+
+
 ### I.Introduction
 
-Hollywood has often used familiar strategies to attract audiences, like making movies based on real-life stories, adapting books or games, or working with popular intellectual properties. However, in recent years, movie theaters have seen fewer big box office hits, and audiences aren't flocking to see the latest films as they used to.
+I believe everyone enjoys a good movie, though what defines a "good film" can vary from person to person—a debate in itself. In this project, I aim to conduct an exploratory data analysis using the [the IMDb
+non-commercial release](https://datasets.imdbws.com/) to uncover insights into movie popularity, ratings, and trends in genre popularity across decades. Ultimately, my goal is to propose a movie remake based on these findings.
 
-This project aims to find new movie ideas by analyzing data from [the IMDb
-non-commercial release](https://datasets.imdbws.com/). By looking at what made past movies successful, identifying top actors and directors,popular genres.. we hope to give Hollywood executives useful insights for creating movies that can draw audiences back to theaters.
+As part of this project, I’ll take on the role of a Hollywood development executive. Traditionally, these executives would acquire life rights for "based on a true story" films, secure options for promising novels, or adapt existing intellectual property (IP). However, in recent years, this process has been criticized for relying too heavily on sequels and reboots. To break away from that pattern, I will use data-driven insights to identify what makes a film successful, analyze the key players in filmmaking, and examine notable Hollywood flops. By understanding these patterns, I’ll aim to propose fresh, innovative movie ideas that resonate with today’s audience.
+
 
 ### II.Data Preparation
 
@@ -22,6 +25,7 @@ The following packages are used for this analysis: `dplyr`, `tidyr`, `DT`, `ggpl
 #### 1.Loading Required Libraries
 
 To begin, we load the necessary R libraries, primarily using the `tidyverse` package for data wrangling and `DT` for data visualization.
+
 
 ```{r echo=TRUE,warning=FALSE,message=FALSE}
 #| message: false 
@@ -36,12 +40,11 @@ library(DT)
 library(ggplot2)
 ```
 
-I have also created a function for interactive table creation
-
 ```{r echo=TRUE}
 #| message: false 
 #| warning: false
 #| code-fold: true
+#I have also created a function for interactive table creation
 table_creation<-function(x){
   datatable(x, 
             options = list(
@@ -58,8 +61,16 @@ table_creation<-function(x){
 
 #### 2.Data Loading
 
+Using the `get_imdb_file`function we are loading all the required DATASETS
+
 ```{r echo=TRUE}
-#| code-fold: true
+#|eval: false
+#|label: 'get_imdb_file function'
+#|code-fold: true
+
+
+
+
 get_imdb_file <- function(fname){
     BASE_URL <- "https://datasets.imdbws.com/"
     fname_ext <- paste0(fname, ".tsv.gz")
@@ -72,172 +83,49 @@ get_imdb_file <- function(fname){
 }
 ```
 
-```{r show_col_types = FALSE, echo=TRUE}
-#| label: 'imdb_name_basics'
-#| eval: false
-#| message: false 
-#| warning: false
-#| cache: true
-#| code-fold: true
-NAME_BASICS <- get_imdb_file("name.basics")
-#write.csv(NAME_BASICS, "~/STA9750-2024-FALL/NAME_BASICS.csv",row.names=TRUE,col.names = TRUE )
-
-```
-
-```{r echo=FALSE}
-#|cache: false
-NAME_BASICS<-read.csv( "~/STA9750-2024-FALL/NAME_BASICS.csv")
-```
-
-
-```{r  echo=TRUE,show_col_types = FALSE, warning=FALSE}
-#| label: 'imdb_Title_basics'
-#| eval: false
-#| message: false 
-#| warning: false
-#| cache: true
-#| code-fold: true
-
+```{r}
+#|eval: false
+#|code-fold: true
 TITLE_BASICS<- get_imdb_file("title.basics")
-#write.csv(TITLE_BASICS, "~/STA9750-2024-FALL/TITLE_BASICS.csv",row.names=TRUE,col.names = TRUE )
-```
-
-
-```{r echo=FALSE}
-#|cache: false
-TITLE_BASICS<-read.csv( "~/STA9750-2024-FALL/TITLE_BASICS.csv")
-```
-
-```{r  echo=TRUE}
-#| label: 'imdb_title_episodes'
-#| eval: false
-#| message: false 
-#| warning: false
-#| code-fold: true
-
-TITLE_EPISODES   <- get_imdb_file("title.episode")
-write.csv(TITLE_EPISODES, "~/STA9750-2024-FALL/TITLE_EPISODES.csv",row.names=TRUE,col.names = TRUE )
-```
-
-```{r echo=FALSE}
-#|cache: false
-TITLE_EPISODES<-read.csv( "~/STA9750-2024-FALL/TITLE_EPISODES.csv")
-```
-
-```{r echo=TRUE}
-#| label: 'imdb_title_ratings'
-#| eval: false
-#| message: false 
-#| warning: false
-#| cache: false
-TITLE_RATINGS    <- get_imdb_file("title.ratings")
-
-
-```
-
-```{r echo=FALSE}
-#|cache: false
-TITLE_RATINGS<-read.csv( "~/STA9750-2024-FALL/TITLE_RATINGS.csv")
-#write.csv(TITLE_RATINGS, "~/STA9750-2024-FALL/TITLE_RATINGS.csv",row.names=TRUE,col.names = TRUE )
-```
-
-```{r show_col_types = FALSE, echo=TRUE}
-#| label: 'imdb_title_crew'
-#| eval: false
-#| message: false 
-#| warning: false
-#| cache: true
-#| code-fold: true
-TITLE_CREW       <- get_imdb_file("title.crew")
-
-```
-
-```{r echo=FALSE}
-#|cache: false
-#write.csv(TITLE_CREW, "~/STA9750-2024-FALL/TITLE_CREW.csv",row.names=TRUE,col.names = TRUE )
-TITLE_CREW<-read.csv( "~/STA9750-2024-FALL/TITLE_CREW.csv")
-```
-
-```{r echo=TRUE}
-#| label: 'imdb_title_principals'
-#| eval: false
-#| message: false 
-#| warning: false
-#| cache: true
-#| code-fold: true
 TITLE_PRINCIPALS <- get_imdb_file("title.principals")
-
-
-
+TITLE_EPISODES   <- get_imdb_file("title.episode")
+NAME_BASICS <- get_imdb_file("name.basics")
+TITLE_RATINGS    <- get_imdb_file("title.ratings")
+TITLE_CREW       <- get_imdb_file("title.crew")
 ```
 
+
 ```{r echo=FALSE}
+#|eval: false
 #|cache: false
+
+
+NAME_BASICS<-read.csv( "~/STA9750-2024-FALL/NAME_BASICS.csv")
+
+TITLE_BASICS<-read.csv( "~/STA9750-2024-FALL/TITLE_BASICS.csv")
+
+TITLE_EPISODES<-read.csv( "~/STA9750-2024-FALL/TITLE_EPISODES.csv")
+TITLE_RATINGS<-read.csv( "~/STA9750-2024-FALL/TITLE_RATINGS.csv")
+TITLE_CREW<-read.csv( "~/STA9750-2024-FALL/TITLE_CREW.csv")
 TITLE_PRINCIPALS1<-read.csv( "~/STA9750-2024-FALL/TITLE_PRINCIPALS.csv")
-#write.csv(TITLE_PRINCIPALS, "~/STA9750-2024-FALL/TITLE_PRINCIPALS.csv",row.names=TRUE,col.names = TRUE )
+
 ```
 
 #### 3.Data Sub-Sampling
 
-For our NAME_BASICS table, we’ll restrict our attention to people with at least two “known for” credits.
+The `NAME_BASICS` dataset is filtered to only include rows where the `knownForTitles` column contains more than one title (indicated by the presence of more than one comma). This step ensures that only individuals known for multiple works are retained.\
+Similarly, `TITLE_RATINGS` are filtered with `numVotes`>100.
 
 ```{r echo=TRUE}
-glimpse(NAME_BASICS)
+#|eval: false
+#|cache: true
+#|code-fold: true
 NAME_BASICS <- NAME_BASICS |> 
     filter(str_count(knownForTitles, ",") > 1)
 
-```
-
-```{r echo=TRUE}
-#| message: false 
-#| warning: false
-#| code-fold: true
-TITLE_RATINGS |>
-    ggplot(aes(x=numVotes)) + 
-    geom_histogram(bins=30) +
-    xlab("Number of IMDB Ratings") + 
-    ylab("Number of Titles") + 
-    ggtitle("Majority of IMDB Titles Have Less than 100 Ratings") + 
-    theme_bw() + 
-    scale_x_log10(label=scales::comma) + 
-    scale_y_continuous(label=scales::comma)
-```
-
-```{r echo=TRUE}
-#| message: false 
-#| warning: false
-#| code-fold: true
-TITLE_RATINGS |>
-    pull(numVotes) |>
-    quantile()
-```
-
-```{r echo=TRUE}
-#| message: false 
-#| warning: false
-#| code-fold: true
 TITLE_RATINGS <- TITLE_RATINGS |>
     filter(numVotes >= 100)
-```
 
-```{r}
-#| message: false 
-#| warning: false
-#| code-fold: true
-glimpse(NAME_BASICS)
-```
-
-```{r}
-#| message: false 
-#| warning: false
-#| code-fold: true
-glimpse(TITLE_BASICS)
-```
-
-```{r echo=TRUE}
-#| message: false 
-#| warning: false
-#| code-fold: true
 TITLE_BASICS <- TITLE_BASICS |>
     semi_join(TITLE_RATINGS, 
               join_by(tconst == tconst))
@@ -263,7 +151,8 @@ TITLE_PRINCIPALS1 <- TITLE_PRINCIPALS1 |> semi_join(TITLE_RATINGS, join_by(tcons
 
 ```
 ### III. Initial Exploration
-::: callout
+
+::: callout-tip
 #### Task 1: Column Type Correction
 :::
 Correct the column types of the TITLE tables using a combination of mutate and the coercion functions as.numeric and as.logical..
@@ -272,11 +161,13 @@ Correct the column types of the TITLE tables using a combination of mutate and t
 #| message: false 
 #| warning: false
 #| code-fold: true
+#| eval: false
 TITLE_BASICS <- TITLE_BASICS |>
     mutate(startYear = as.numeric(startYear))
 TITLE_BASICS<-TITLE_BASICS |> separate_longer_delim(genres, ",") 
-glimpse(TITLE_BASICS)
 ```
+
+Similarly, the `Genres` column needs to be cleaned. I decided to keep only relevant genres and rest are classified as others. `genre_cleaned` includes: `"Action", "Comedy", "Drama", "Horror", "Romance", "Thriller", "Adventure", "Animation", "Biography", "Crime", "Documentary","Musical","Romance","Sci-Fi"`
 
 ```{r echo=TRUE}
 #| message: false 
@@ -298,7 +189,7 @@ TITLE_BASICS <- TITLE_BASICS |>
 NAME_BASICS <- NAME_BASICS |>
     mutate(birthYear = as.numeric(birthYear),
            deathYear = as.numeric(deathYear))
-glimpse(NAME_BASICS)
+
 ```
 
 ```{r}
@@ -307,39 +198,24 @@ glimpse(NAME_BASICS)
 #| code-fold: true
 
 TITLE_CREW<-TITLE_CREW |> separate_longer_delim(directors, ",")
-glimpse(TITLE_CREW)
+
 ```
 
 ```{r}
 #| message: false 
 #| warning: false
 #| code-fold: true
-glimpse(TITLE_EPISODES)
+
 TITLE_EPISODES<-TITLE_EPISODES|>mutate(
             seasonNumber=as.numeric(seasonNumber),
            episodeNumber=as.numeric(episodeNumber))
 ```
 
-```{r}
-#| message: false 
-#| warning: false
-#| code-fold: true
-glimpse(TITLE_PRINCIPALS1)
-```
 
-```{r}
-#| message: false 
-#| warning: false
-#| code-fold: true
-glimpse(TITLE_RATINGS)
-```
-
-
-::: callout 
+::: callout-tipout 
 #### Task 2: Instructor-Provided Questions
 :::
->1.How many movies are in our data set? How many TV series? How many TV episodes?
-
+1.How many movies are in our data set? How many TV series? How many TV episodes?\
 ```{r}
 #| message: false 
 #| warning: false
@@ -370,7 +246,8 @@ episode_count<-count_title("episode")
 print(paste0("There are ", movie_count, " movies, ", series_count, " series and ", episode_count, " episodes in the TITLE_BASICS dataset."))
 ```
 
->2.Who is the oldest living person in our data set?
+2.Who is the oldest living person in our data set?\
+
 
 According to [wikipedia](https://en.wikipedia.org/wiki/List_of_oldest_living_people), the oldest person alive in the world is of 1908 onwards. Hence, I keep checked for people who are born on 1908 and afterwards, and who doesn't a death year
 
@@ -385,7 +262,8 @@ NAME_BASICS|>select(-knownForTitles)|>
 
 There are 111 individuals who were born in the year 1911.
 
->3.There is one TV Episode in this data set with a perfect 10/10 rating and 200,000 IMDb ratings. What is it? What series does it belong to?
+
+3.There is one TV Episode in this data set with a perfect 10/10 rating and 200,000 IMDb ratings. What is it? What series does it belong to?\
 
 ```{r echo=TRUE}
 #| message: false 
@@ -405,7 +283,8 @@ table_creation(perfect_episode|>
 
 The perfect rated TV episode is "Ozymandias" which is the 14th Episode in Season 5 of Breaking Bad TV Series.
 
->4.What four projects is the actor Mark Hamill most known for? I wrote a function `find_projects` which takes `actor_or_director` name as a parameter and returns all the projects they have been part of.
+4.What four projects is the actor Mark Hamill most known for?\
+I wrote a function `find_projects` which takes `actor_or_director` name as a parameter and returns all the projects they have been part of.
 
 I began by joining the `TITLE_RATINGS` and `TITLE_EPISODES` datasets to create `TITLE_BASICS_RATING_1` and `TITLE_BASICS_RATING_2`, using the tconst (title constants) as the key. This ensured that all relevant title ratings and episode information were combined.
 
@@ -424,13 +303,13 @@ TITLE_RATING_EPISODE<-TITLE_RATING_EPISODE|>
   arrange(desc(averageRating),desc(numVotes))|>distinct()
 rm(TITLE_BASICS_RATING_1)
 rm(TITLE_BASICS_RATING_2)
-sample_n(TITLE_RATING_EPISODE,100)|>DT::datatable()
 ```
 
 I created the dataset `ALL_TITLES` by merging title information (such as `primaryTitle`, `titleType`, and `startYear`) with the `TITLE_RATING_EPISODE`. I filtered out any entries categorized under the genre "Others" to focus on specific genres.
 
 ```{r}
 #| label: 'ALL_TITLES'
+#| eval: true
 #| code-fold: true
 #|code-summary: "Show the code"
 
@@ -463,7 +342,7 @@ sample_n(ALL_CREW,100)|> DT::datatable()
 
 ```{r}
 #| label: 'ALL_CREW_Full_Join'
-#| eval: true 
+#| eval: true
 #| message: false 
 #| warning: false
 #| cache: true
@@ -511,7 +390,7 @@ find_projects(name)|>select(primaryTitle,averageRating,numVotes)|>distinct()|>
 
 Based on the above analysis and functions, we find that Mark Hamill is famously known for the following four film/TV Series projects, which are Star Wars movies, The Batman Animated movies,Scooby Doo Animated Series and Avatar:The Last Airbender animated series. Mark Hamill is prestigious to be included in these film projects as they are highly rated and loved by the fans, especially Star Wars movies, The Last Airbender Animated Series and the Batman Animated movies.
 
->5.What TV series, with more than 12 episodes, has the highest average rating?
+5.What TV series, with more than 12 episodes, has the highest average rating?
 
 ```{r echo=TRUE}
 #| message: false 
@@ -532,17 +411,19 @@ As seen from the above table, Breaking Bad ranks the first among the top ten TV 
 
 ### IV. Quantifying Success
 
-::: callout 
+::: callout-tipout 
 
 #### Task 3
 :::
 >Design a ‘success’ measure for IMDb entries, reflecting both quality and broad popular awareness. 
 Implement your success metric using a mutate operator to add a new column to the TITLE_RATINGS table.
 
-I created a new variable `new_rating` with Smoothing Formula:
-The new rating is calculated using a simple form of Bayesian average to account for the uncertainty in ratings with a low number of votes. The formula used is:
+I created a new variable, `new_rating`, using the Smoothing Formula:
 
-$$ new-rating=(averageRating×numVotes+1)/(numVotes+2) $$
+In simple terms, when I watch a movie, there are two outcomes: either I like it or I don’t. I add my vote as +1 and 2 to the denominator. This method uses a simplified Bayesian average to handle uncertainty in ratings with few votes. The formula is:
+The formula used is:
+
+$$ new rating=(averageRating×numVotes+1)/(numVotes+2) $$
 
 $$ new-rating= (numVotes+2)(averageRating×numVotes+1) $$
 
@@ -556,7 +437,7 @@ Dividing by numVotes + 2 accounts for the additional "pseudo-votes" introduced b
 #| code-fold: true
 ALL_TITLES<-ALL_TITLES|>mutate(new_rating=round((averageRating*numVotes+1)/(numVotes+2),3))
 ```
->1.Choose the top 5-10 movies on your metric and confirm that they were indeed box office successes.
+1.Choose the top 5-10 movies on your metric and confirm that they were indeed box office successes.\
 
 I used the function `identify_title` to filter movies
 
@@ -597,7 +478,7 @@ table_creation(highest_top_50(movies_rated|>select(-genre_cleaned)|>distinct()))
 
 ```
 
->2.Choose 3-5 movies with large numbers of IMDb votes that score poorly on your success metric and confirm that they are indeed of low quality.
+2.Choose 3-5 movies with large numbers of IMDb votes that score poorly on your success metric and confirm that they are indeed of low quality.
 
 To identify movies with a large number of IMDb votes but poor performance on the success metric, I sorted the movies_rated dataset by descending order of numVotes and filtered for movies with a new_rating of less than 5. The following code selects the top 10 movies fitting this criterion and excludes the columns tconst and titleType:
 
@@ -613,7 +494,7 @@ table_creation(movies_rated |>
 
 ```
 
->3.Choose a prestige actor or director and confirm that they have many projects with high scores on your success metric.
+3.Choose a prestige actor or director and confirm that they have many projects with high scores on your success metric.
 
 ```{r}
 #| message: false 
@@ -673,11 +554,11 @@ projects1 |>
 
 ```
 
->4.Perform at least one other form of ‘spot check’ validation.
+4.Perform at least one other form of ‘spot check’ validation.
 
 
 
->5.Come up with a numerical threshold for a project to be a ‘success’; that is, determine a value such that movies above are all “solid” or better.
+5.Come up with a numerical threshold for a project to be a ‘success’; that is, determine a value such that movies above are all “solid” or better.
 
 The `Genres` column has multiple values, hence cleaning it a bit.
 
@@ -737,12 +618,12 @@ sample_n(ALL_TITLES,100)|>DT::datatable()
 ```
 
 
-###Examining Success by Genre and Decade
+### Examining Success by Genre and Decade
 
-::: callout 
-####Task 4
+::: callout-tipout 
+#### Task 4
 :::
->1.What was the genre with the most “successes” in each decade? 
+1.What was the genre with the most “successes” in each decade? 
 
 I filtered the `ALL_TITLES` dataset to create a new dataset called `success_project`s, containing only the titles marked as successful (where `success_metrics equals 1`). This dataset was then prepared for further analysis.
 I also ensured the `startYear` column was numeric for accurate processing and examined a sample of successful projects.
@@ -845,7 +726,7 @@ success_decade |>
 
 It is `Drama` category is been the most successes in all decades. 
 
->2.What genre consistently has the most “successes”? What genre used to reliably produced “successes” and has fallen out of favor?
+2.What genre consistently has the most “successes”? What genre used to reliably produced “successes” and has fallen out of favor?
 
 To analyze the trends in movie genres over time regarding their success, we can examine the average ratings by genre for each decade. This will help us identify which genre has consistently had the most successes and which genre has fallen out of favor over the years.
 
@@ -1061,33 +942,25 @@ bio_anime_movies<-ALL_TITLES|>identify_title("movie")|>filter( genre_cleaned%in%
 bio_anime_movies <- bio_anime_movies |>filter(vote_quantile>3)|>select(-averageRating,-startYear)|>
   left_join(ALL_CREW |> filter(!is.na(primaryName)), by = c("tconst" = "tconst")) |>
   distinct()
-sample_n(bio_anime_movies,100)|>DT::datatable()
+sample_n(bio_anime_movies|>select(-X)|>arrange(desc(numVotes),desc(new_rating)),100)|>DT::datatable()
 ```
 
-
+::: callout-tipout
 #### Task 5:
+:::
 
+Identify (at least) two actors and one director who you will target as the key talent for your movie. Write a short “pitch” as to why they are likely to be successful. You should support your pitch with at least one graphic and one table.
 
->Identify (at least) two actors and one director who you will target as the key talent for your movie. Write a short “pitch” as to why they are likely to be successful. You should support your pitch with at least one graphic and one table.
 
 ```{r}
 #| message: false 
 #| warning: false
 #| code-fold: true
-bio_anime_movies|>select(primaryName,primaryTitle)|>distinct()|>
-  group_by(primaryName)|>
-  summarize(count=n())|>ungroup()|>arrange(desc(count))
-```
-
-```{r}
-#| message: false 
-#| warning: false
-#| code-fold: true
-find_projects("Mary Hidalgo")|>identify_title("movie")|> mutate(is_animation = ifelse(genre_cleaned %in% c("Animation","Biography"), 1, 0))|>select(new_rating,numVotes,is_animation,genre_cleaned)|>
+find_projects("Brad Bird")|>identify_title("movie")|> mutate(is_animation = ifelse(genre_cleaned %in% c("Animation","Biography"), 1, 0))|>select(new_rating,numVotes,is_animation,genre_cleaned)|>
   ggplot(aes(x = new_rating, y = genre_cleaned, color = as.factor(is_animation))) +
  geom_boxplot() +  # Adjust shape for filled points
   labs(
-    title = "Mary Hidalgo's Movies Rating Based on Genres",
+    title = "Brad Bird's Movies Rating Based on Genres",
     x = "Ratings",
     y = "Genre",
     color = "Is_Animation"
@@ -1104,112 +977,34 @@ find_projects("Mary Hidalgo")|>identify_title("movie")|> mutate(is_animation = i
 #| message: false 
 #| warning: false
 #| code-fold: true
-find_projects("Mary Hidalgo")|>identify_title("movie")|>select(-titleType,-tconst)|>filter(success_metrics==1,genre_cleaned %in% c("Biography","Animation"))|>DT::datatable()
-```
-She has a lot of box office hits.
-
-
-Now I am trying to find actor for my movie.
-
-```
-#| label: 'Biography Movies Actor'
-#| eval: true
-#| message: false 
-#| warning: false
-#| cache: false
-#| code-fold: true
-#|code-summary: "Show the code"
-
-bio_anime_movies<-bio_anime_movies|>left_join(TITLE_PRINCIPALS1|>select(nconst,category)|>filter(!is.na(category)),by=c("nconst"="nconst"))|>distinct()
-
-
-bio_anime_movies|>group_by(primaryName,category)|>
-summarize(count=n(),.groups="drop")|>arrange(desc(count))|>filter(category %in% c("actor","director","actress"))|>
-  slice(1:100)|>DT::datatable()
-#write.csv(bio_anime_movies, "~/STA9750-2024-FALL/bio_anime_movies.csv",row.names=TRUE,col.names = TRUE )
-```
-
-```
-find_projects("Brian Grazer")|>identify_title("movie")|> mutate(is_biography = ifelse(genre_cleaned == "Biography", 1, 0))|>select(new_rating,numVotes,is_biography,genre_cleaned)|>
-  ggplot(aes(x = new_rating, y = genre_cleaned,color=as.factor(is_biography))) +
- geom_boxplot() +  # Adjust shape for filled points
-  labs(
-    title = "Brian Grazer's Movies Ratings Based on Genres",
-    x = "Ratings",
-    y = "Genre",
-    color = "Is_Biography"
-  ) +
-  
-  theme_minimal() +
-  theme(legend.position = "bottom")
-  
+find_projects("Brad Bird")|>identify_title("movie")|>select(-titleType,-tconst,-X)|>filter(success_metrics==1)|>DT::datatable()
 ```
 
 
 
+### VII. Nostalgia and Remakes
+
+After reviewing the list of highly rated films on IMDb, one biographical movie stands out that I would love to remake: *Lawrence of Arabia*, originally released in 1962 and directed by David Lean. With an impressive 8.3 rating and over 321,000 votes.
+```{r}
+bio_anime_movies|>filter(grepl("Lawrence of Arabia", primaryTitle))|>select(primaryTitle,numVotes,new_rating,decade)|>distinct()
 ```
-find_projects("Robert") |>
-  identify_title("movie") |>
-  mutate(is_biography = ifelse(genre_cleaned == "Biography", "Biography", "Others")) |>
-  select(startYear, numVotes, new_rating, is_biography) |>
-  ggplot(aes(x = startYear, y = new_rating, fill = as.factor(is_biography), size = numVotes)) +
-  geom_point(shape = 21, color = "black") +  # Shape 21 allows for point fill with color border
-  labs(
-    title = "Brian Grazer's Movies Ratings Yearly based on Genre",
-    x = "Year",
-    y = "New Rating",
-    fill = "Is Biography",
-    size="Num of Votes"
-  ) +
-  scale_fill_manual(values = c("Others" = "gray", "Biography" = "blue")) +  # Correct color mapping
-  theme_minimal() +
-  theme(
-    legend.position = "bottom",
-    panel.border = element_rect(color = "black", fill = NA, size = 1)  # Add black borders
-  ) + 
-  facet_wrap(~is_biography)
-
-```
-
-```
-#| label: 'Biography Movies Actoress'
-#| eval: true
-#| message: false 
-#| warning: false
-#| cache: false
-#| code-fold: true
-#|code-summary: "Show the code"
+This film remains a masterpiece, telling the story of the war between Arab revolutionaries, British forces, and the Ottomans following World War I. While other films have touched on aspects of T.E. Lawrence's life, none have revisited this pivotal narrative in a remake.
 
 
 
-bio_anime_movies|>group_by(primaryName,category,decade)|>
-summarize(count=n(),.groups="drop",ratings=mean(new_rating))|>arrange(desc(decade),desc(count),desc(ratings))|>filter(category=="actress")|>
-  #category %in% c("actor","director","actress"))|>
-  slice(1:30)|>DT::datatable()
-```
+I believe an animated version of this iconic story would be the perfect reimagining for several reasons. My inspiration comes largely from *The Prophet*, the animated adaptation of Khalil Gibran’s famous work. As a youngerself, I found the animated format more digestible and memorable than simply reading through the poems. Animation has a unique ability to convey complex ideas and emotions in a way that is visually engaging and easier to absorb.
 
-```
-find_projects("Sobhita Dhulipala") |>
-  identify_title("movie") |>
-  mutate(is_biography = ifelse(genre_cleaned == "Biography", "Biography", "Others"))|>  select(startYear, numVotes, new_rating, is_biography)|>
-  ggplot(aes(x = startYear, y = new_rating, fill = as.factor(is_biography), size = numVotes)) +
-  geom_point(shape = 21, color = "black") +  # Shape 21 allows for point fill with color border
-  labs(
-    title = "Sobhita Dhulipala's Movies Ratings Yearly based on Genre",
-    x = "Year",
-    y = "New Rating",
-    fill = "Is Biography",
-    size="Num of Votes"
-  ) +
-  scale_fill_manual(values = c("Others" = "gray", "Biography" = "blue")) +  # Correct color mapping
-  theme_minimal() +
-  theme(
-    legend.position = "bottom",
-    panel.border = element_rect(color = "black", fill = NA, size = 1)  # Add black borders
-  ) + 
-  facet_wrap(~is_biography)
+Similarly, I want today’s generation to experience this historical epic in a format that is accessible and captivating, without the need to sit through a lengthy three-hour film. By bringing this story to life through animation, the film would have a broader reach, appealing not just to movie critics but to a general audience who may find an animated version more approachable and engaging. It’s about creating a modern, digestible, and visually stunning way to explore a timeless historical narrative.
 
-```
-### VII.Nostalgia and Remakes
+The voices would be delivered by `Benedict Cumberbatch` as `T.E. Lawrence`, `Anthony Hopkins` as `Prince Faisal`, and `Morgan Freeman` as the narrator. Directed by *Brad Bird*, known for `The Incredibles`, this project could introduce *Lawrence of Arabia* to a new generation while preserving its legendary status.
 
-### VIII.Putting It Together
+The original film featured a phenomenal creative team, including David Lean (Director), Robert Bolt and Michael Wilson (Writers), Peter O'Toole (T.E. Lawrence), and Alec Guinness (Prince Faisal). Unfortunately, most of the original team is no longer with us, as per IMDb records, but their legacy would live on in this re imagined animated version.
+
+### VIII. Putting It Together
+
+![](docs/movie.png){fig-align="center"}
+
+In analyzing trends of the popularity of the genres, biographical and animated films have shown remarkable growth.They consistanly has average rating more than 6.5 every decade from 1940-now.  Animation’s wide appeal across age groups—from children to adults—stems from its ability to highlight the beauty of everyday moments, turning them into deeply emotional and universally relatable stories. The format’s timeless appeal makes it perfect for projects that require both visual grandeur and intimate emotional depth.
+
+An animated *Lawrence of Arabia* with Pixar Animation Studios would blend the sweeping beauty of desert landscapes and Bedouin culture with the raw emotions of war, betrayal, and the human experience.  With the rich, resonant voices of *Morgan Freeman*, *Benedict Cumberbatch*, and *Anthony Hopkins*, the film could stir powerful emotions and empathy in viewers. And under the direction of *Brad Bird*, known for The Incredibles and Wall-E, this project could win hearts worldwide.
+
