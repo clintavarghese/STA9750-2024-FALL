@@ -1,5 +1,5 @@
 ---
-title: "mp2"
+title: "Mini Project #2: IMDB Dataset Analysis"
 editor: visual
 format:
   html: 
@@ -21,9 +21,9 @@ The following packages are used for this analysis: `dplyr`, `tidyr`, `DT`, `ggpl
 To begin, we load the necessary R libraries, primarily using the `tidyverse` package for data wrangling and `DT` for data visualization.
 
 ```{r echo=TRUE,warning=FALSE,message=FALSE}
-#| message: false 
-#| warning: false
-#| code-fold: true
+#|message: false 
+#|warning: false
+#|code-fold: true
 if(!require("ggplot2")) install.packages("ggplot2")
 if (!require("tidyverse")) install.packages("tidyverse")
 if (!require("DT")) install.packages("DT")
@@ -33,9 +33,9 @@ library(ggplot2)
 ```
 
 ```{r echo=TRUE}
-#| message: false 
-#| warning: false
-#| code-fold: true
+#|message: false 
+#|warning: false
+#|code-fold: true
 #I have also created a function for interactive table creation
 table_creation<-function(x){
   datatable(x, 
@@ -222,9 +222,9 @@ table(TITLE_BASICS$titleType)
 I write a function`count_title` to identify the project type and count.
 
 ```{r echo=TRUE}
-#| message: false 
-#| warning: false
-#| code-fold: true
+#|message: false 
+#|warning: false
+#|code-fold: true
 count_title<-function(x){
   word<-x
   count<-sum(grepl(word,TITLE_BASICS$titleType,ignore.case = TRUE))
@@ -233,9 +233,9 @@ count_title<-function(x){
 ```
 
 ```{r}
-#| message: false 
-#| warning: false
-#| code-fold: true
+#|message: false 
+#|warning: false
+#|code-fold: true
 movie_count<-count_title("movie")
 series_count<-count_title("series")
 episode_count<-count_title("episode")
@@ -245,9 +245,9 @@ print(paste0("There are ", movie_count, " movies, ", series_count, " series and 
 2.According to [wikipedia](https://en.wikipedia.org/wiki/List_of_oldest_living_people), the oldest person alive in the world is of 1908 onwards. Hence, I keep checked for people who are born on 1908 and afterwards, and who doesn't a death year
 
 ```{r echo=TRUE}
-#| message: false 
-#| warning: false
-#| code-fold: true
+#|message: false 
+#|warning: false
+#|code-fold: true
 NAME_BASICS|>select(-knownForTitles)|>
   filter(birthYear==1908, is.na(deathYear))|>
   distinct(primaryName, .keep_all = TRUE)|>select(primaryName,primaryProfession)|>DT::datatable()
@@ -449,6 +449,7 @@ Validate your success metric as follows:
 :::
 
 **SUCCESS METRICS **
+
 Design a ‘success’ measure for IMDb entries, reflecting both quality and broad popular awareness. Implement your success metric using a mutate operator to add a new column to the TITLE_RATINGS table.
 
 I created a new variable, `new_rating`, using the Smoothing Formula:
@@ -967,6 +968,7 @@ anim <- ALL_MOVIES_1 |>
  
 ```
 
+
 From this graph, we could identify that `Dramas`,`Comedy`,`Action`,`Adventure`, `Crime` have been always popular. However, there is a good amount attention being given for `Biography` and `Animations` in recent years.
 
 ### VI.Successful Personnel in the Genre
@@ -981,10 +983,10 @@ We focus on the `Biography` genre to identify high-quality films. The process be
 #| code-fold: true
 bio_anime_movies<-ALL_TITLES|>identify_title("movie")|>filter( genre_cleaned%in% c("Biography","Animation"))|>distinct()
 
-bio_anime_movies <- bio_anime_movies |>filter(vote_quantile>3)|>select(-averageRating,-startYear)|>
+bio_anime_movies <- bio_anime_movies |>filter(vote_quantile>3)|>select(-averageRating,-startYear,-X)|>
   left_join(ALL_CREW |> filter(!is.na(primaryName)), by = c("tconst" = "tconst")) |>
   distinct()
-sample_n(bio_anime_movies|>select(-X)|>arrange(desc(numVotes),desc(new_rating)),100)|>DT::datatable()
+sample_n(bio_anime_movies|>arrange(desc(numVotes),desc(new_rating)),100)|>DT::datatable()
 ```
 
 ::: {.callout-tip}
@@ -995,8 +997,8 @@ the key talent for your movie. Write a short "pitch" as to why they are
 likely to be successful. You should support your pitch with at least one
 graphic and one table.
 :::
-I chose Director as `Brad Bird` because of his extensive success records.
 
+I chose Director as `Brad Bird` because of his extensive success records.
 ```{r}
 #| message: false 
 #| warning: false
@@ -1030,7 +1032,7 @@ find_projects("Brad Bird")|>identify_title("movie")|>select(-titleType,-tconst,-
 After reviewing the list of highly rated films on IMDb, one biographical movie stands out that I would love to remake: *Lawrence of Arabia*, originally released in 1962 and directed by David Lean. With an impressive 8.3 rating and over 321,000 votes.
 
 ```{r}
-bio_anime_movies|>filter(grepl("Lawrence of Arabia", primaryTitle))|>select(primaryTitle,numVotes,new_rating,decade)|>distinct()
+table_creation(bio_anime_movies|>filter(grepl("Lawrence of Arabia", primaryTitle))|>select(tconst,primaryTitle,numVotes,new_rating,decade)|>distinct())
 ```
 
 This film remains a masterpiece, telling the story of the war between Arab revolutionaries, British forces, and the Ottomans following World War I. While other films have touched on aspects of T.E. Lawrence's life, none have revisited this pivotal narrative in a remake.
@@ -1041,7 +1043,14 @@ Similarly, I want today’s generation to experience this historical epic in a f
 
 The voices would be delivered by `Benedict Cumberbatch` as `T.E. Lawrence`, `Anthony Hopkins` as `Prince Faisal`, and `Morgan Freeman` as the narrator. Directed by *Brad Bird*, known for `The Incredibles`, this project could introduce *Lawrence of Arabia* to a new generation while preserving its legendary status.
 
-The original film featured a phenomenal creative team, including David Lean (Director), Robert Bolt and Michael Wilson (Writers), Peter O'Toole (T.E. Lawrence), and Alec Guinness (Prince Faisal). Unfortunately, most of the original team is no longer with us, as per IMDb records, but their legacy would live on in this re imagined animated version.
+The original film featured a phenomenal creative team, including David Lean (Director), Robert Bolt and Michael Wilson (Writers), Peter O'Toole (T.E. Lawrence), and Alec Guinness (Prince Faisal). Unfortunately, all the original team is no longer with us, as per IMDb records, but their legacy would live on in this re imagined animated version.
+```{r}
+ ALL_CREW |>
+  filter(tconst == "tt0056172")|>select(nconst,primaryName)|>left_join(NAME_BASICS|>select(nconst,primaryName,birthYear,deathYear),,by=c("nconst"="nconst","primaryName"="primaryName"))|>select(-nconst)|>arrange(desc(deathYear))|>DT::datatable(caption = "Lawence Of Arabia Crew")
+  
+
+
+```
 
 
 
