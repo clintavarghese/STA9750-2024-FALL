@@ -1,22 +1,16 @@
 ---
 title: "mp2"
 editor: visual
-execute: 
-  cache: true
 format:
   html: 
     code-link: true
 ---
 
-
-
 ### I.Introduction
 
-I believe everyone enjoys a good movie, though what defines a "good film" can vary from person to person—a debate in itself. In this project, I aim to conduct an exploratory data analysis using the [the IMDb
-non-commercial release](https://datasets.imdbws.com/) to uncover insights into movie popularity, ratings, and trends in genre popularity across decades. Ultimately, my goal is to propose a movie remake based on these findings.
+I believe everyone enjoys a good movie, though what defines a "good film" can vary from person to person—a debate in itself. In this project, I aim to conduct an exploratory data analysis using the [the IMDb non-commercial release](https://datasets.imdbws.com/) to uncover insights into movie popularity, ratings, and trends in genre popularity across decades. Ultimately, my goal is to propose a movie remake based on these findings.
 
 As part of this project, I’ll take on the role of a Hollywood development executive. Traditionally, these executives would acquire life rights for "based on a true story" films, secure options for promising novels, or adapt existing intellectual property (IP). However, in recent years, this process has been criticized for relying too heavily on sequels and reboots. To break away from that pattern, I will use data-driven insights to identify what makes a film successful, analyze the key players in filmmaking, and examine notable Hollywood flops. By understanding these patterns, I’ll aim to propose fresh, innovative movie ideas that resonate with today’s audience.
-
 
 ### II.Data Preparation
 
@@ -26,11 +20,9 @@ The following packages are used for this analysis: `dplyr`, `tidyr`, `DT`, `ggpl
 
 To begin, we load the necessary R libraries, primarily using the `tidyverse` package for data wrangling and `DT` for data visualization.
 
-
 ```{r echo=TRUE,warning=FALSE,message=FALSE}
 #| message: false 
 #| warning: false
-#| cache: true
 #| code-fold: true
 if(!require("ggplot2")) install.packages("ggplot2")
 if (!require("tidyverse")) install.packages("tidyverse")
@@ -83,7 +75,7 @@ get_imdb_file <- function(fname){
 }
 ```
 
-```{r}
+```
 #|eval: false
 #|code-fold: true
 TITLE_BASICS<- get_imdb_file("title.basics")
@@ -94,11 +86,8 @@ TITLE_RATINGS    <- get_imdb_file("title.ratings")
 TITLE_CREW       <- get_imdb_file("title.crew")
 ```
 
-
 ```{r echo=FALSE}
 #|eval: false
-#|cache: false
-
 
 NAME_BASICS<-read.csv( "~/STA9750-2024-FALL/NAME_BASICS.csv")
 
@@ -114,11 +103,10 @@ TITLE_PRINCIPALS1<-read.csv( "~/STA9750-2024-FALL/TITLE_PRINCIPALS.csv")
 #### 3.Data Sub-Sampling
 
 The `NAME_BASICS` dataset is filtered to only include rows where the `knownForTitles` column contains more than one title (indicated by the presence of more than one comma). This step ensures that only individuals known for multiple works are retained.\
-Similarly, `TITLE_RATINGS` are filtered with `numVotes`>100.
+Similarly, `TITLE_RATINGS` are filtered with `numVotes`\>100.
 
 ```{r echo=TRUE}
 #|eval: false
-#|cache: true
 #|code-fold: true
 NAME_BASICS <- NAME_BASICS |> 
     filter(str_count(knownForTitles, ",") > 1)
@@ -150,11 +138,13 @@ TITLE_PRINCIPALS1 <- TITLE_PRINCIPALS1 |> semi_join(TITLE_RATINGS, join_by(tcons
 
 
 ```
+
 ### III. Initial Exploration
 
-::: callout-tip
+::: {callout-tip}
 #### Task 1: Column Type Correction
 :::
+
 Correct the column types of the TITLE tables using a combination of mutate and the coercion functions as.numeric and as.logical..
 
 ```{r warning=FALSE}
@@ -211,11 +201,17 @@ TITLE_EPISODES<-TITLE_EPISODES|>mutate(
            episodeNumber=as.numeric(episodeNumber))
 ```
 
-
-::: callout-tipout 
+::: {callout-tipout}
 #### Task 2: Instructor-Provided Questions
+
+1.  How many movies are in our data set? How many TV series? How many TV episodes?
+2.  Who is the oldest living person in our data set?
+3.  There is one TV Episode in this data set with a perfect 10/10 rating and at least 200,000 IMDb ratings. What is it? What series does it belong to?
+4.  What four projects is the actor Mark Hamill most known for?
+5.  What TV series, with more than 12 episodes, has the highest average rating?
+6.  The TV series *Happy Days* (1974-1984) gives us the common idiom ["jump the shark"](https://en.wikipedia.org/wiki/Jumping_the_shark). The phrase comes from a controversial fifth season episode (aired in 1977) in which a lead character literally jumped over a shark on water skis. Idiomatically, it is used to refer to the moment when a once-great show becomes ridiculous and rapidly looses quality. Is it true that episodes from later seasons of *Happy Days* have lower average ratings than the early seasons?
 :::
-1.How many movies are in our data set? How many TV series? How many TV episodes?\
+
 ```{r}
 #| message: false 
 #| warning: false
@@ -246,10 +242,7 @@ episode_count<-count_title("episode")
 print(paste0("There are ", movie_count, " movies, ", series_count, " series and ", episode_count, " episodes in the TITLE_BASICS dataset."))
 ```
 
-2.Who is the oldest living person in our data set?\
-
-
-According to [wikipedia](https://en.wikipedia.org/wiki/List_of_oldest_living_people), the oldest person alive in the world is of 1908 onwards. Hence, I keep checked for people who are born on 1908 and afterwards, and who doesn't a death year
+2.According to [wikipedia](https://en.wikipedia.org/wiki/List_of_oldest_living_people), the oldest person alive in the world is of 1908 onwards. Hence, I keep checked for people who are born on 1908 and afterwards, and who doesn't a death year
 
 ```{r echo=TRUE}
 #| message: false 
@@ -262,8 +255,7 @@ NAME_BASICS|>select(-knownForTitles)|>
 
 There are 111 individuals who were born in the year 1911.
 
-
-3.There is one TV Episode in this data set with a perfect 10/10 rating and 200,000 IMDb ratings. What is it? What series does it belong to?\
+**PERFECT RATED EPISODE**
 
 ```{r echo=TRUE}
 #| message: false 
@@ -281,9 +273,10 @@ table_creation(perfect_episode|>
                  select(originalTitle,titleType,seasonNumber,episodeNumber,averageRating,numVotes)|>distinct())
 ```
 
-The perfect rated TV episode is "Ozymandias" which is the 14th Episode in Season 5 of Breaking Bad TV Series.
+The perfect rated TV episode is [Ozymandias](https://www.imdb.com/title/tt2301451/) which is the 14th Episode in Season 5 of Breaking Bad TV Series.
 
-4.What four projects is the actor Mark Hamill most known for?\
+**FIND PROJECTS OF ANY ACTOR OR DIRECTOR**
+
 I wrote a function `find_projects` which takes `actor_or_director` name as a parameter and returns all the projects they have been part of.
 
 I began by joining the `TITLE_RATINGS` and `TITLE_EPISODES` datasets to create `TITLE_BASICS_RATING_1` and `TITLE_BASICS_RATING_2`, using the tconst (title constants) as the key. This ensured that all relevant title ratings and episode information were combined.
@@ -330,6 +323,7 @@ I gathered crew information by combining `TITLE_CREW` (containing director data)
 #| cache: true
 #| code-fold: true
 #|code-summary: "Show the code"
+
 TITLE_RATINGS_CREW_1<-ALL_TITLES|>select(tconst)|>full_join(TITLE_CREW|>select(tconst,directors),by=c("tconst"="tconst"))|>distinct()
 
 TITLE_RATING_CREW_2<-ALL_TITLES|>select(tconst)|>full_join(TITLE_PRINCIPALS1|>select(tconst,nconst),by=c("tconst"="tconst"))|>distinct()
@@ -337,7 +331,7 @@ TITLE_RATING_CREW_2<-ALL_TITLES|>select(tconst)|>full_join(TITLE_PRINCIPALS1|>se
 ALL_CREW=bind_rows(TITLE_RATINGS_CREW_1|>rename(nconst=directors),TITLE_RATING_CREW_2)
 rm(TITLE_RATINGS_CREW_1,TITLE_RATING_CREW_2)
 
-sample_n(ALL_CREW,100)|> DT::datatable()
+sample_n(ALL_CREW,10)|> DT::datatable()
 ```
 
 ```{r}
@@ -345,16 +339,15 @@ sample_n(ALL_CREW,100)|> DT::datatable()
 #| eval: true
 #| message: false 
 #| warning: false
-#| cache: true
 #| code-fold: true
 #|code-summary: "Show the code"
 library(tidyverse)
 ALL_CREW=ALL_CREW|>full_join(NAME_BASICS|>select(nconst,primaryName,knownForTitles),by=c("nconst"="nconst"))
 ALL_CREW<-ALL_CREW|>distinct()
-sample_n(ALL_CREW,100)|>DT::datatable()
+sample_n(ALL_CREW,10)|>DT::datatable()
+
 ```
 
-I developed a function called `find_projects` that takes the name of an actor or director as input (in this case, "Mark Hamill"). The function filters the combined dataset (ALL_CREW) to find all projects associated with the specified person, including those in the `knownForTitles` column. The function then searches for these titles in the `ALL_TITLES` dataset to return the relevant projects.
 
 ```{r}
 #| label: 'function find Projects'
@@ -379,6 +372,9 @@ find_projects<-function(actor_or_director){
 }
 ```
 
+**MARK HAMIL'S FAMOUS PROJECTS**
+
+I developed a function called `find_projects` that takes the name of an actor or director as input (in this case, "Mark Hamill"). The function filters the combined dataset (ALL_CREW) to find all projects associated with the specified person, including those in the `knownForTitles` column. The function then searches for these titles in the `ALL_TITLES` dataset to return the relevant projects
 ```{r}
 #| message: false 
 #| warning: false
@@ -390,46 +386,80 @@ find_projects(name)|>select(primaryTitle,averageRating,numVotes)|>distinct()|>
 
 Based on the above analysis and functions, we find that Mark Hamill is famously known for the following four film/TV Series projects, which are Star Wars movies, The Batman Animated movies,Scooby Doo Animated Series and Avatar:The Last Airbender animated series. Mark Hamill is prestigious to be included in these film projects as they are highly rated and loved by the fans, especially Star Wars movies, The Last Airbender Animated Series and the Batman Animated movies.
 
-5.What TV series, with more than 12 episodes, has the highest average rating?
+**HIGHEST RATED SERIES**
 
 ```{r echo=TRUE}
 #| message: false 
 #| warning: false
 #| code-fold: true
 
-SERIES<-right_join(ALL_TITLES,TITLE_EPISODES|>filter(episodeNumber>12)|>distinct(parentTconst,.keep_all = TRUE)|>select(-tconst),by=c("tconst"="parentTconst"))
+SERIES <- right_join(
+  ALL_TITLES,
+  TITLE_EPISODES |>
+    na.omit() |> 
+    filter(episodeNumber > 12)|>
+    distinct(parentTconst, .keep_all = TRUE) |> # Keep distinct rows based on  
+    select(-tconst),                # Drop the tconst column
+  by = c("tconst" = "parentTconst") )
 ```
 
 ```{r echo=TRUE}
 #| message: false 
 #| warning: false
 #| code-fold: true
-SERIES|>arrange(desc(numVotes),desc(averageRating))|>select(primaryTitle,averageRating,numVotes)|>distinct()|>slice(1:10)
+
+library(wordcloud)
+
+
+SERIES<-SERIES|>arrange(desc(numVotes),desc(averageRating))|>select(primaryTitle,averageRating,numVotes)|>distinct()|>slice(1:25)
+
+wordcloud(words = SERIES$primaryTitle, freq = SERIES$numVotes, 
+          random.order = FALSE, colors = brewer.pal(8, "Dark2"),
+           scale = c(4, 0.5), border = "black", 
+          fixed.asp = TRUE, use.r.layout = TRUE)
+#Add a border by plotting a rectangle
+rect(-1, -1, 1, 1, border = "black", lwd = 5)
+```
+```{r}
+SERIES|>DT::datatable()
 ```
 
 As seen from the above table, Breaking Bad ranks the first among the top ten TV series, that has the highest number of votes and rated well by the critics. It deserves to be rated as the highest because of the thrilling intensity, it gives the viewers as well as the way they show each of the character development and growth through each of the episode and season.
 
 ### IV. Quantifying Success
 
-::: callout-tipout 
+::: {.callout-tip}
+#### Task 3: Custom Success Metric
 
-#### Task 3
+Design a 'success' measure for IMDb entries, reflecting both quality and
+broad popular awareness. Implement your success metric using a `mutate`
+operator to add a new column to the `TITLE_RATINGS` table. 
+
+Validate your success metric as follows: 
+
+1. Choose the top 5-10 movies on your metric and confirm that they were
+   indeed box office successes.
+2. Choose 3-5 movies with large numbers of IMDb votes that score poorly
+   on your success metric and confirm that they are indeed of low quality.
+3. Choose a prestige actor or director and confirm that they have many projects
+   with high scores on your success metric.
+4. Perform at least one other form of 'spot check' validation. 
+5. Come up with a numerical threshold for a project to be a 'success'; that is,
+   determine a value $v$ such that movies above $v$ are all "solid" or better.
 :::
->Design a ‘success’ measure for IMDb entries, reflecting both quality and broad popular awareness. 
-Implement your success metric using a mutate operator to add a new column to the TITLE_RATINGS table.
+
+**SUCCESS METRICS **
+Design a ‘success’ measure for IMDb entries, reflecting both quality and broad popular awareness. Implement your success metric using a mutate operator to add a new column to the TITLE_RATINGS table.
 
 I created a new variable, `new_rating`, using the Smoothing Formula:
 
-In simple terms, when I watch a movie, there are two outcomes: either I like it or I don’t. I add my vote as +1 and 2 to the denominator. This method uses a simplified Bayesian average to handle uncertainty in ratings with few votes. The formula is:
-The formula used is:
+In simple terms, when I watch a movie, there are two outcomes: either I like it or I don’t. I add my vote as +1 and 2 to the denominator. This method uses a simplified Bayesian average to handle uncertainty in ratings with few votes. The formula is: The formula used is:
 
 $$ new rating=(averageRating×numVotes+1)/(numVotes+2) $$
 
 $$ new-rating= (numVotes+2)(averageRating×numVotes+1) $$
 
-The term averageRating \* numVotes gives the total sum of the ratings.
-Adding 1 to the numerator is a form of smoothing to slightly increase ratings with low votes. 
-Dividing by numVotes + 2 accounts for the additional "pseudo-votes" introduced by the smoothing factor.
+The term averageRating \* numVotes gives the total sum of the ratings. Adding 1 to the numerator is a form of smoothing to slightly increase ratings with low votes. Dividing by numVotes + 2 accounts for the additional "pseudo-votes" introduced by the smoothing factor.
 
 ```{r}
 #| message: false 
@@ -437,7 +467,8 @@ Dividing by numVotes + 2 accounts for the additional "pseudo-votes" introduced b
 #| code-fold: true
 ALL_TITLES<-ALL_TITLES|>mutate(new_rating=round((averageRating*numVotes+1)/(numVotes+2),3))
 ```
-1.Choose the top 5-10 movies on your metric and confirm that they were indeed box office successes.\
+
+**High Votes, High Ratings: The Movies Everyone Watched And Everyone Liked **
 
 I used the function `identify_title` to filter movies
 
@@ -473,12 +504,12 @@ highest_top_50<-function(df)
 #| code-fold: true
 library(DT)
 movies_rated<-identify_title(ALL_TITLES,"movie")
-table_creation(highest_top_50(movies_rated|>select(-genre_cleaned)|>distinct()))
+table_creation(highest_top_50(movies_rated|>select(-genre_cleaned,-X)|>distinct()))
    
 
 ```
 
-2.Choose 3-5 movies with large numbers of IMDb votes that score poorly on your success metric and confirm that they are indeed of low quality.
+**High Votes, Low Ratings: The Movies Everyone Watched But No One Liked**
 
 To identify movies with a large number of IMDb votes but poor performance on the success metric, I sorted the movies_rated dataset by descending order of numVotes and filtered for movies with a new_rating of less than 5. The following code selects the top 10 movies fitting this criterion and excludes the columns tconst and titleType:
 
@@ -490,11 +521,11 @@ To identify movies with a large number of IMDb votes but poor performance on the
 table_creation(movies_rated |> 
     arrange(desc(numVotes)) |> 
     filter(new_rating<5) |> 
-        select( -tconst, -titleType,-genre_cleaned)|>slice(1:10)|>distinct())
+        select( -tconst, -titleType,-genre_cleaned,-X,-averageRating)|>slice(1:20)|>distinct())
 
 ```
 
-3.Choose a prestige actor or director and confirm that they have many projects with high scores on your success metric.
+**TOM HANKS's MOVIES**
 
 ```{r}
 #| message: false 
@@ -507,11 +538,9 @@ library(dplyr)
 
 # Assuming `find_projects()` is a function that takes a name and returns a data frame of projects
 name="Tom Hanks"
-projects1<-find_projects(name)
-
 
 # Select relevant columns
-projects1|>select(primaryTitle,new_rating,numVotes)|>distinct()|>
+find_projects(name)|>select(primaryTitle,new_rating,numVotes)|>distinct()|>
   arrange(desc(new_rating),desc(numVotes))|>DT::datatable()
   
 ```
@@ -525,7 +554,7 @@ projects1|>select(primaryTitle,new_rating,numVotes)|>distinct()|>
 #|code-summary: "Show the code"
 library(dplyr)
 library(ggplot2)
-projects1 |>
+find_projects(name) |>
   filter(new_rating > median(averageRating)) |>
   group_by(genre_cleaned)|>
   summarize(count = n(), .groups = "drop")|>
@@ -554,13 +583,10 @@ projects1 |>
 
 ```
 
-4.Perform at least one other form of ‘spot check’ validation.
+[Tom Hanks](https://www.imdb.com/name/nm0000158/) is my favorite Actor.
 
 
-
-5.Come up with a numerical threshold for a project to be a ‘success’; that is, determine a value such that movies above are all “solid” or better.
-
-The `Genres` column has multiple values, hence cleaning it a bit.
+**Determining the Cutoff: What Makes a Movie 'Solid'?**
 
 ```{r}
 #| message: false 
@@ -581,7 +607,9 @@ To better analyze the data, I arranged the `ALL_TITLES` dataset by both `numVote
 ALL_TITLES <- ALL_TITLES|> arrange(numVotes,new_rating)|>
   mutate(vote_quantile = ntile(numVotes, 4))  
 ```
+
 I created a density plot using ggplot2 to visualize the distribution of new_rating across the different vote quantiles. This visual representation helps identify how ratings are distributed in relation to the number of votes, offering insight into which movies are considered "solid" based on their vote counts.
+
 ```{r echo=TRUE}
 #| message: false 
 #| warning: false
@@ -595,7 +623,7 @@ ggplot(ALL_TITLES, aes(x = new_rating, fill = factor(vote_quantile))) +
 
 ```
 
-I defined a success metric in the dataset by creating a new column, `success_metrics`. Movies are assigned a value of `1` if they fall into the` highest vote quantile (quantile 4) and have a new_rating greater than the median new_rating`. Otherwise, they are assigned a value of 0. This approach helps categorize movies as "successful" or "not successful" based on a combination of their rating and the number of votes they received.
+I defined a success metric in the dataset by creating a new column, `success_metrics`. Movies are assigned a value of `1` if they fall into the`highest vote quantile (quantile 4) and have a new_rating greater than the median new_rating`. Otherwise, they are assigned a value of 0. This approach helps categorize movies as "successful" or "not successful" based on a combination of their rating and the number of votes they received.
 
 ```{r}
 #| message: false 
@@ -609,7 +637,6 @@ ALL_TITLES <- ALL_TITLES |>
 rm(TITLE_EPISODES_2)
 ```
 
-
 ```{r}
 #| message: false 
 #| warning: false
@@ -617,16 +644,25 @@ rm(TITLE_EPISODES_2)
 sample_n(ALL_TITLES,100)|>DT::datatable()
 ```
 
-
 ### Examining Success by Genre and Decade
 
-::: callout-tipout 
-#### Task 4
-:::
-1.What was the genre with the most “successes” in each decade? 
+::: {.callout-tip}
+#### Task 4: Trends in Success Over Time
+Using questions like the following, identify a good "genre" for your next 
+film. You do not need to answer these questions precisely, but these are
+may help guide your thinking. 
 
-I filtered the `ALL_TITLES` dataset to create a new dataset called `success_project`s, containing only the titles marked as successful (where `success_metrics equals 1`). This dataset was then prepared for further analysis.
-I also ensured the `startYear` column was numeric for accurate processing and examined a sample of successful projects.
+1. What was the genre with the most "successes" in each decade? 
+2. What genre consistently has the most "successes"? What genre used to reliably produced "successes" and has fallen out of favor? 
+3. What genre has produced the most "successes" since 2010? Does it have the
+   highest success rate or does it only have a large number of successes
+   because there are many productions in that genre? 
+4. What genre has become more popular in recent years? 
+:::
+
+**Charting Success: Which Genre Dominated Each Decade?**
+
+I filtered the `ALL_TITLES` dataset to create a new dataset called `success_project`s, containing only the titles marked as successful (where `success_metrics equals 1`). This data set was then prepared for further analysis. I also ensured the `startYear` column was numeric for accurate processing and examined a sample of successful projects.
 
 ```{r echo=TRUE}
 #| message: false 
@@ -644,8 +680,7 @@ sample_n(success_projects,100)|>DT::datatable()
 summary(success_projects$startYear)
 ```
 
-After summarizing the startYear, I removed any duplicate entries and filtered out projects with the genre "Others" to focus on distinct genres.
-A new column, `decade`, was created based on the `startYear`. This column categorizes the years into decades, allowing for easier analysis of trends over time.
+After summarizing the startYear, I removed any duplicate entries and filtered out projects with the genre "Others" to focus on distinct genres. A new column, `decade`, was created based on the `startYear`. This column categorizes the years into decades, allowing for easier analysis of trends over time.
 
 ```{r echo=TRUE}
 #| label: 'successful projects based decade'
@@ -715,18 +750,22 @@ success_decade |>
   theme(axis.text.x = element_text(angle = 90, hjust = 1,size = 6))
 ```
 
-
 ```{r}
-success_decade |>
+words<-success_decade |>
   group_by(decade, genre_cleaned) |>
   summarize(genre_count = n(), .groups = "drop") |>
-  ungroup()|>group_by(decade) |> 
-  slice_max(genre_count, n = 1)
+  ungroup()
+  
+wordcloud(words = words$genre_cleaned, freq = words$genre_count, 
+          random.order = FALSE, colors = brewer.pal(8, "Dark2"),
+           scale = c(4, 0.5), border = "black", 
+          fixed.asp = TRUE, use.r.layout = TRUE)
+
 ```
 
-It is `Drama` category is been the most successes in all decades. 
+It is `Drama` category is been the most successes in all decades.
 
-2.What genre consistently has the most “successes”? What genre used to reliably produced “successes” and has fallen out of favor?
+**The Genre That Never Fails: A Consistent Success Story**
 
 To analyze the trends in movie genres over time regarding their success, we can examine the average ratings by genre for each decade. This will help us identify which genre has consistently had the most successes and which genre has fallen out of favor over the years.
 
@@ -765,10 +804,11 @@ ALL_MOVIES<-ALL_TITLES|>
 "primaryTitle"="primaryTitle","genre_cleaned"="genre_cleaned"))
 
 ```
-I then created a new dataset, `ALL_MOVIES`, which consists of  movie titles along with their respective genres, start years, and ratings.
 
-I calculated the `average rating for each genre per decade` and `filtered out the 2020s` to focus on earlier trends.
-This summary provides insight into how each genre performed over the decades.
+I then created a new dataset, `ALL_MOVIES`, which consists of movie titles along with their respective genres, start years, and ratings.
+
+I calculated the `average rating for each genre per decade` and `filtered out the 2020s` to focus on earlier trends. This summary provides insight into how each genre performed over the decades.
+
 ```{r}
 #| message: false 
 #| warning: false
@@ -795,15 +835,16 @@ ggplot( aes(x = decade, y = Average_Rating, color = decade)) +
 
 
 ```
+
 `Documentry`,`Biography` and `Animation` genres consistently produce movies with higher average ratings, typically above 6.5./
 On the other hand, `Sci-fi`,`Horror`,`Thriller` present higher risks in terms of audience reception and ratings.These genres were particularly popular in the 1940s and 1950s, a time when they captivated audiences with imaginative storytelling and thrilling experiences. However, over the decades, the landscape of cinema has evolved, and audiences’ tastes have shifted./
 
 Throughout the decades, Drama has emerged as a dominant genre, enjoying sustained popularity across various eras. However, recent trends indicate that the audience's appetite for dramatic storytelling may be waning.
 
-
->3.What genre has produced the most “successes” since 2010? Does it have the highest success rate or does it only have a large number of successes because there are many productions in that genre?
+**Quantity vs. Quality: The Genre with the Most Successes Since 2010**
 
 The analysis reveals the total number of successes for each genre within the specified time frame. By grouping the data by genre_cleaned and success_metrics, we determined how many projects in each genre were classified as successful (success_metrics = 1) compared to non-successful (success_metrics = 0).
+
 ```{r}
 #| message: false 
 #| warning: false
@@ -836,6 +877,7 @@ ggplot(x, aes(x = reorder(genre_cleaned,total), y=total,fill=as.factor(success_m
   theme_minimal() +
   theme(axis.text.x = element_text( hjust = 1,angle=90))
 ```
+
 At a glance, the analysis indicates that the `Drama` genre has produced the most successful projects since 2010, followed closely by `Comedy` and `Thriller`. However, when we examine the success rate by considering the ratio of successful projects to the total number of projects within each genre, the results shift significantly.
 
 ```{r echo=TRUE}
@@ -865,10 +907,9 @@ ggplot(x|>filter(success_metrics==1), aes(x = reorder(genre_cleaned,percentage),
 
 ```
 
-`Biography`, `Animation`, and `Documentary` genres emerge as the leaders in terms of success metrics when we look at the proportion of successful films.
-The disparity between the total number of successful projects in `Drama`, `Comedy`, and `Thriller` versus the success rates in `Biography`, `Animation`, and `Documentary` indicates that while traditional genres like Drama may produce a higher volume of successful films, newer or less conventional genres are achieving a greater proportion of success relative to their output. This suggests that these genres are not only producing fewer films but are also prioritizing quality and engagement, leading to better ratings and audience reception.
+`Biography`, `Animation`, and `Documentary` genres emerge as the leaders in terms of success metrics when we look at the proportion of successful films. The disparity between the total number of successful projects in `Drama`, `Comedy`, and `Thriller` versus the success rates in `Biography`, `Animation`, and `Documentary` indicates that while traditional genres like Drama may produce a higher volume of successful films, newer or less conventional genres are achieving a greater proportion of success relative to their output. This suggests that these genres are not only producing fewer films but are also prioritizing quality and engagement, leading to better ratings and audience reception.
 
->4.What genre has become more popular in recent years?
+**Emerging Favorites: The Rise of [Genre] in Recent Years**
 
 ```{r}
 #| message: false 
@@ -926,7 +967,6 @@ anim <- ALL_MOVIES_1 |>
 
 From this graph, we could identify that `Dramas`,`Comedy`,`Action`,`Adventure`, `Crime` have been always popular. However, there is a good amount attention being given for `Biography` and `Animations` in recent years.
 
-
 ### VI.Successful Personnel in the Genre
 
 Based on my findings I have decided to combine `Biography` Genre and `Animation`.
@@ -945,12 +985,15 @@ bio_anime_movies <- bio_anime_movies |>filter(vote_quantile>3)|>select(-averageR
 sample_n(bio_anime_movies|>select(-X)|>arrange(desc(numVotes),desc(new_rating)),100)|>DT::datatable()
 ```
 
-::: callout-tipout
-#### Task 5:
+::: {.callout-tip}
+#### Task 5: Key Personnel
+
+Identify (at least) two actors and one director who you will target as
+the key talent for your movie. Write a short "pitch" as to why they are
+likely to be successful. You should support your pitch with at least one
+graphic and one table.
 :::
-
-Identify (at least) two actors and one director who you will target as the key talent for your movie. Write a short “pitch” as to why they are likely to be successful. You should support your pitch with at least one graphic and one table.
-
+I chose Director as `Brad Bird` because of his extensive success records.
 
 ```{r}
 #| message: false 
@@ -980,19 +1023,17 @@ find_projects("Brad Bird")|>identify_title("movie")|> mutate(is_animation = ifel
 find_projects("Brad Bird")|>identify_title("movie")|>select(-titleType,-tconst,-X)|>filter(success_metrics==1)|>DT::datatable()
 ```
 
-
-
 ### VII. Nostalgia and Remakes
 
 After reviewing the list of highly rated films on IMDb, one biographical movie stands out that I would love to remake: *Lawrence of Arabia*, originally released in 1962 and directed by David Lean. With an impressive 8.3 rating and over 321,000 votes.
+
 ```{r}
 bio_anime_movies|>filter(grepl("Lawrence of Arabia", primaryTitle))|>select(primaryTitle,numVotes,new_rating,decade)|>distinct()
 ```
+
 This film remains a masterpiece, telling the story of the war between Arab revolutionaries, British forces, and the Ottomans following World War I. While other films have touched on aspects of T.E. Lawrence's life, none have revisited this pivotal narrative in a remake.
 
-
-
-I believe an animated version of this iconic story would be the perfect reimagining for several reasons. My inspiration comes largely from *The Prophet*, the animated adaptation of Khalil Gibran’s famous work. As a youngerself, I found the animated format more digestible and memorable than simply reading through the poems. Animation has a unique ability to convey complex ideas and emotions in a way that is visually engaging and easier to absorb.
+I believe an animated version of this iconic story would be the perfect reimagining for several reasons. My inspiration comes largely from [The Prophet](https://www.imdb.com/title/tt1640718/), the animated adaptation of Khalil Gibran’s famous work. As a younger self, I found the animated format more digestible and memorable than simply reading through the poems. Animation has a unique ability to convey complex ideas and emotions in a way that is visually engaging and easier to absorb.
 
 Similarly, I want today’s generation to experience this historical epic in a format that is accessible and captivating, without the need to sit through a lengthy three-hour film. By bringing this story to life through animation, the film would have a broader reach, appealing not just to movie critics but to a general audience who may find an animated version more approachable and engaging. It’s about creating a modern, digestible, and visually stunning way to explore a timeless historical narrative.
 
@@ -1002,9 +1043,8 @@ The original film featured a phenomenal creative team, including David Lean (Dir
 
 ### VIII. Putting It Together
 
-![](docs/movie.png){fig-align="center"}
+![credits:Tumblar](docs/movie.png){fig-align="center"}
 
-In analyzing trends of the popularity of the genres, biographical and animated films have shown remarkable growth.They consistanly has average rating more than 6.5 every decade from 1940-now.  Animation’s wide appeal across age groups—from children to adults—stems from its ability to highlight the beauty of everyday moments, turning them into deeply emotional and universally relatable stories. The format’s timeless appeal makes it perfect for projects that require both visual grandeur and intimate emotional depth.
+In analyzing trends of the popularity of the genres, biographical and animated films have shown remarkable growth.They consistanly has average rating more than 6.5 every decade from 1940-now. Animation’s wide appeal across age groups—from children to adults—stems from its ability to highlight the beauty of everyday moments, turning them into deeply emotional and universally relatable stories. The format’s timeless appeal makes it perfect for projects that require both visual grandeur and intimate emotional depth.
 
-An animated *Lawrence of Arabia* with Pixar Animation Studios would blend the sweeping beauty of desert landscapes and Bedouin culture with the raw emotions of war, betrayal, and the human experience.  With the rich, resonant voices of *Morgan Freeman*, *Benedict Cumberbatch*, and *Anthony Hopkins*, the film could stir powerful emotions and empathy in viewers. And under the direction of *Brad Bird*, known for The Incredibles and Wall-E, this project could win hearts worldwide.
-
+An animated *Lawrence of Arabia* with Pixar Animation Studios would blend the sweeping beauty of desert landscapes and Bedouin culture with the raw emotions of war, betrayal, and the human experience. With the rich, resonant voices of *Morgan Freeman*, *Benedict Cumberbatch*, and *Anthony Hopkins*, the film could stir powerful emotions and empathy in viewers. And under the direction of *Brad Bird*, known for The Incredibles and Wall-E, this project could win hearts worldwide.
