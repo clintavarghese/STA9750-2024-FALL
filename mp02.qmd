@@ -6,11 +6,22 @@ format:
     code-link: true
 ---
 
+## Table of Contents
+
+[I.Introduction]\
+[II.Data Preparation]\
+[III.Initial Exploration]\
+[IV.Quantifying Success]\
+[V.Examining Success by Genre and Decade]\
+[VI.Successful Personnel in the Genre]\
+[VII.Nostalgia and Remakes]\
+[VIII.Movie Pitch]\
+
 ### I.Introduction
 
 I believe everyone enjoys a good movie, though what defines a "good film" can vary from person to person—a debate in itself. In this project, I aim to conduct an exploratory data analysis using the [the IMDb non-commercial release](https://datasets.imdbws.com/) to uncover insights into movie popularity, ratings, and trends in genre popularity across decades. Ultimately, my goal is to propose a movie remake based on these findings.
 
-As part of this project, I’ll take on the role of a Hollywood development executive. Traditionally, these executives would acquire life rights for "based on a true story" films, secure options for promising novels, or adapt existing intellectual property (IP). However, in recent years, this process has been criticized for relying too heavily on sequels and reboots. To break away from that pattern, I will use data-driven insights to identify what makes a film successful, analyze the key players in filmmaking, and examine notable Hollywood flops. By understanding these patterns, I’ll aim to propose fresh, innovative movie ideas that resonate with today’s audience.
+As part of this project, I’ll take on the role of a Hollywood development executive. Traditionally, these executives would acquire life rights for "based on a true story" films, secure options for promising novels, or adapt existing intellectual property (IP). However, in recent years, this process has been criticized for relying too heavily on sequels and reboots. To break away from that pattern, I will use data-driven insights to identify what makes a film successful, analyze the key players in film making, and examine notable Hollywood flops. By understanding these patterns, I’ll aim to propose fresh, innovative movie ideas that resonate with today’s audience.
 
 ### II.Data Preparation
 
@@ -75,7 +86,7 @@ get_imdb_file <- function(fname){
 }
 ```
 
-```
+```         
 #|eval: false
 #|code-fold: true
 TITLE_BASICS<- get_imdb_file("title.basics")
@@ -139,7 +150,7 @@ TITLE_PRINCIPALS1 <- TITLE_PRINCIPALS1 |> semi_join(TITLE_RATINGS, join_by(tcons
 
 ```
 
-### III. Initial Exploration
+### III.Initial Exploration
 
 ::: {callout-tip}
 #### Task 1: Column Type Correction
@@ -348,7 +359,6 @@ sample_n(ALL_CREW,10)|>DT::datatable()
 
 ```
 
-
 ```{r}
 #| label: 'function find Projects'
 #| eval: true
@@ -375,6 +385,7 @@ find_projects<-function(actor_or_director){
 **MARK HAMIL'S FAMOUS PROJECTS**
 
 I developed a function called `find_projects` that takes the name of an actor or director as input (in this case, "Mark Hamill"). The function filters the combined dataset (ALL_CREW) to find all projects associated with the specified person, including those in the `knownForTitles` column. The function then searches for these titles in the `ALL_TITLES` dataset to return the relevant projects
+
 ```{r}
 #| message: false 
 #| warning: false
@@ -420,35 +431,30 @@ wordcloud(words = SERIES$primaryTitle, freq = SERIES$numVotes,
 #Add a border by plotting a rectangle
 rect(-1, -1, 1, 1, border = "black", lwd = 5)
 ```
+
 ```{r}
 SERIES|>DT::datatable()
 ```
 
 As seen from the above table, Breaking Bad ranks the first among the top ten TV series, that has the highest number of votes and rated well by the critics. It deserves to be rated as the highest because of the thrilling intensity, it gives the viewers as well as the way they show each of the character development and growth through each of the episode and season.
 
-### IV. Quantifying Success
+### IV.Quantifying Success
 
-::: {.callout-tip}
+::: callout-tip
 #### Task 3: Custom Success Metric
 
-Design a 'success' measure for IMDb entries, reflecting both quality and
-broad popular awareness. Implement your success metric using a `mutate`
-operator to add a new column to the `TITLE_RATINGS` table. 
+Design a 'success' measure for IMDb entries, reflecting both quality and broad popular awareness. Implement your success metric using a `mutate` operator to add a new column to the `TITLE_RATINGS` table.
 
-Validate your success metric as follows: 
+Validate your success metric as follows:
 
-1. Choose the top 5-10 movies on your metric and confirm that they were
-   indeed box office successes.
-2. Choose 3-5 movies with large numbers of IMDb votes that score poorly
-   on your success metric and confirm that they are indeed of low quality.
-3. Choose a prestige actor or director and confirm that they have many projects
-   with high scores on your success metric.
-4. Perform at least one other form of 'spot check' validation. 
-5. Come up with a numerical threshold for a project to be a 'success'; that is,
-   determine a value $v$ such that movies above $v$ are all "solid" or better.
+1.  Choose the top 5-10 movies on your metric and confirm that they were indeed box office successes.
+2.  Choose 3-5 movies with large numbers of IMDb votes that score poorly on your success metric and confirm that they are indeed of low quality.
+3.  Choose a prestige actor or director and confirm that they have many projects with high scores on your success metric.
+4.  Perform at least one other form of 'spot check' validation.
+5.  Come up with a numerical threshold for a project to be a 'success'; that is, determine a value $v$ such that movies above $v$ are all "solid" or better.
 :::
 
-**SUCCESS METRICS **
+**SUCCESS METRICS**
 
 Design a ‘success’ measure for IMDb entries, reflecting both quality and broad popular awareness. Implement your success metric using a mutate operator to add a new column to the TITLE_RATINGS table.
 
@@ -469,7 +475,7 @@ The term averageRating \* numVotes gives the total sum of the ratings. Adding 1 
 ALL_TITLES<-ALL_TITLES|>mutate(new_rating=round((averageRating*numVotes+1)/(numVotes+2),3))
 ```
 
-**High Votes, High Ratings: The Movies Everyone Watched And Everyone Liked **
+**High Votes, High Ratings: The Movies Everyone Watched And Everyone Liked**
 
 I used the function `identify_title` to filter movies
 
@@ -586,7 +592,6 @@ find_projects(name) |>
 
 [Tom Hanks](https://www.imdb.com/name/nm0000158/) is my favorite Actor.
 
-
 **Determining the Cutoff: What Makes a Movie 'Solid'?**
 
 ```{r}
@@ -645,20 +650,17 @@ rm(TITLE_EPISODES_2)
 sample_n(ALL_TITLES,100)|>DT::datatable()
 ```
 
-### Examining Success by Genre and Decade
+### V.Examining Success by Genre and Decade
 
-::: {.callout-tip}
+::: callout-tip
 #### Task 4: Trends in Success Over Time
-Using questions like the following, identify a good "genre" for your next 
-film. You do not need to answer these questions precisely, but these are
-may help guide your thinking. 
 
-1. What was the genre with the most "successes" in each decade? 
-2. What genre consistently has the most "successes"? What genre used to reliably produced "successes" and has fallen out of favor? 
-3. What genre has produced the most "successes" since 2010? Does it have the
-   highest success rate or does it only have a large number of successes
-   because there are many productions in that genre? 
-4. What genre has become more popular in recent years? 
+Using questions like the following, identify a good "genre" for your next film. You do not need to answer these questions precisely, but these are may help guide your thinking.
+
+1.  What was the genre with the most "successes" in each decade?
+2.  What genre consistently has the most "successes"? What genre used to reliably produced "successes" and has fallen out of favor?
+3.  What genre has produced the most "successes" since 2010? Does it have the highest success rate or does it only have a large number of successes because there are many productions in that genre?
+4.  What genre has become more popular in recent years?
 :::
 
 **Charting Success: Which Genre Dominated Each Decade?**
@@ -839,8 +841,7 @@ ggplot( aes(x = decade, y = Average_Rating, color = decade)) +
 
 ```
 
-`Documentry`,`Biography` and `Animation` genres consistently produce movies with higher average ratings, typically above 6.5./
-On the other hand, `Sci-fi`,`Horror`,`Thriller` present higher risks in terms of audience reception and ratings.These genres were particularly popular in the 1940s and 1950s, a time when they captivated audiences with imaginative storytelling and thrilling experiences. However, over the decades, the landscape of cinema has evolved, and audiences’ tastes have shifted./
+`Documentry`,`Biography` and `Animation` genres consistently produce movies with higher average ratings, typically above 6.5./ On the other hand, `Sci-fi`,`Horror`,`Thriller` present higher risks in terms of audience reception and ratings.These genres were particularly popular in the 1940s and 1950s, a time when they captivated audiences with imaginative storytelling and thrilling experiences. However, over the decades, the landscape of cinema has evolved, and audiences’ tastes have shifted./
 
 Throughout the decades, Drama has emerged as a dominant genre, enjoying sustained popularity across various eras. However, recent trends indicate that the audience's appetite for dramatic storytelling may be waning.
 
@@ -912,7 +913,7 @@ ggplot(x|>filter(success_metrics==1), aes(x = reorder(genre_cleaned,percentage),
 
 `Biography`, `Animation`, and `Documentary` genres emerge as the leaders in terms of success metrics when we look at the proportion of successful films. The disparity between the total number of successful projects in `Drama`, `Comedy`, and `Thriller` versus the success rates in `Biography`, `Animation`, and `Documentary` indicates that while traditional genres like Drama may produce a higher volume of successful films, newer or less conventional genres are achieving a greater proportion of success relative to their output. This suggests that these genres are not only producing fewer films but are also prioritizing quality and engagement, leading to better ratings and audience reception.
 
-**Emerging Favorites: The Rise of [Genre] in Recent Years**
+**Emerging Favorites: The Rise of \[Genre\] in Recent Years**
 
 ```{r}
 #| message: false 
@@ -968,7 +969,6 @@ anim <- ALL_MOVIES_1 |>
  
 ```
 
-
 From this graph, we could identify that `Dramas`,`Comedy`,`Action`,`Adventure`, `Crime` have been always popular. However, there is a good amount attention being given for `Biography` and `Animations` in recent years.
 
 ### VI.Successful Personnel in the Genre
@@ -989,16 +989,14 @@ bio_anime_movies <- bio_anime_movies |>filter(vote_quantile>3)|>select(-averageR
 sample_n(bio_anime_movies|>arrange(desc(numVotes),desc(new_rating)),100)|>DT::datatable()
 ```
 
-::: {.callout-tip}
+::: callout-tip
 #### Task 5: Key Personnel
 
-Identify (at least) two actors and one director who you will target as
-the key talent for your movie. Write a short "pitch" as to why they are
-likely to be successful. You should support your pitch with at least one
-graphic and one table.
+Identify (at least) two actors and one director who you will target as the key talent for your movie. Write a short "pitch" as to why they are likely to be successful. You should support your pitch with at least one graphic and one table.
 :::
 
 I chose Director as `Brad Bird` because of his extensive success records.
+
 ```{r}
 #| message: false 
 #| warning: false
@@ -1027,7 +1025,7 @@ find_projects("Brad Bird")|>identify_title("movie")|> mutate(is_animation = ifel
 find_projects("Brad Bird")|>identify_title("movie")|>select(-titleType,-tconst,-X)|>filter(success_metrics==1)|>DT::datatable()
 ```
 
-### VII. Nostalgia and Remakes
+### VII.Nostalgia and Remakes {#vii.-nostalgia-and-remakes}
 
 After reviewing the list of highly rated films on IMDb, one biographical movie stands out that I would love to remake: *Lawrence of Arabia*, originally released in 1962 and directed by David Lean. With an impressive 8.3 rating and over 321,000 votes.
 
@@ -1044,6 +1042,7 @@ Similarly, I want today’s generation to experience this historical epic in a f
 The voices would be delivered by `Benedict Cumberbatch` as `T.E. Lawrence`, `Anthony Hopkins` as `Prince Faisal`, and `Morgan Freeman` as the narrator. Directed by *Brad Bird*, known for `The Incredibles`, this project could introduce *Lawrence of Arabia* to a new generation while preserving its legendary status.
 
 The original film featured a phenomenal creative team, including David Lean (Director), Robert Bolt and Michael Wilson (Writers), Peter O'Toole (T.E. Lawrence), and Alec Guinness (Prince Faisal). Unfortunately, all the original team is no longer with us, as per IMDb records, but their legacy would live on in this re imagined animated version.
+
 ```{r}
  ALL_CREW |>
   filter(tconst == "tt0056172")|>select(nconst,primaryName)|>left_join(NAME_BASICS|>select(nconst,primaryName,birthYear,deathYear),,by=c("nconst"="nconst","primaryName"="primaryName"))|>select(-nconst)|>arrange(desc(deathYear))|>DT::datatable(caption = "Lawence Of Arabia Crew")
@@ -1052,13 +1051,14 @@ The original film featured a phenomenal creative team, including David Lean (Dir
 
 ```
 
-
-
-
-### VIII. Putting It Together
+### VIII.Movie Pitch
 
 ![credits:Tumblar](docs/movie.png){fig-align="center"}
 
-In analyzing trends of the popularity of the genres, biographical and animated films have shown remarkable growth.They consistanly has average rating more than 6.5 every decade from 1940-now. Animation’s wide appeal across age groups—from children to adults—stems from its ability to highlight the beauty of everyday moments, turning them into deeply emotional and universally relatable stories. The format’s timeless appeal makes it perfect for projects that require both visual grandeur and intimate emotional depth.
+In analyzing trends of the [popularity](V.Examining Success by Genre and Decade) biographical and animated films have shown remarkable growth.They consistanly has average rating more than 6.5 every decade from 1940-now. Animation’s wide appeal across age groups—from children to adults—stems from its ability to highlight the beauty of everyday moments, turning them into deeply emotional and universally relatable stories. The format’s timeless appeal makes it perfect for projects that require both visual grandeur and intimate emotional depth.
 
 An animated *Lawrence of Arabia* with Pixar Animation Studios would blend the sweeping beauty of desert landscapes and Bedouin culture with the raw emotions of war, betrayal, and the human experience. With the rich, resonant voices of *Morgan Freeman*, *Benedict Cumberbatch*, and *Anthony Hopkins*, the film could stir powerful emotions and empathy in viewers. And under the direction of *Brad Bird*, known for The Incredibles and Wall-E, this project could win hearts worldwide.
+
+### Appendix
+
+Check out my reviews and ratings for other movies. [MY IMDB PROFILE](https://www.imdb.com/user/ur63617271)
