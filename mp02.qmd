@@ -751,6 +751,8 @@ success_decade |>
 ```
 
 ```{r}
+#|warning: false
+
 words<-success_decade |>
   group_by(decade, genre_cleaned) |>
   summarize(genre_count = n(), .groups = "drop") |>
@@ -758,7 +760,7 @@ words<-success_decade |>
   
 wordcloud(words = words$genre_cleaned, freq = words$genre_count, 
           random.order = FALSE, colors = brewer.pal(8, "Dark2"),
-           scale = c(4, 0.5), border = "black", 
+           scale = c(4, 0.5), 
           fixed.asp = TRUE, use.r.layout = TRUE)
 
 ```
@@ -1040,6 +1042,9 @@ Similarly, I want today’s generation to experience this historical epic in a f
 The voices would be delivered by `Benedict Cumberbatch` as `T.E. Lawrence`, `Anthony Hopkins` as `Prince Faisal`, and `Morgan Freeman` as the narrator. Directed by *Brad Bird*, known for `The Incredibles`, this project could introduce *Lawrence of Arabia* to a new generation while preserving its legendary status.
 
 The original film featured a phenomenal creative team, including David Lean (Director), Robert Bolt and Michael Wilson (Writers), Peter O'Toole (T.E. Lawrence), and Alec Guinness (Prince Faisal). Unfortunately, most of the original team is no longer with us, as per IMDb records, but their legacy would live on in this re imagined animated version.
+
+
+
 
 ### VIII. Putting It Together
 
