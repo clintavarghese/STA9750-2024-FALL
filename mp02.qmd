@@ -31,7 +31,7 @@ The following packages are used for this analysis: `dplyr`, `tidyr`, `DT`, `ggpl
 
 To begin, we load the necessary R libraries, primarily using the `tidyverse` package for data wrangling and `DT` for data visualization.
 
-```{r echo=TRUE,warning=FALSE,message=FALSE}
+```{r}
 #|message: false 
 #|warning: false
 #|code-fold: true
@@ -43,7 +43,7 @@ library(DT)
 library(ggplot2)
 ```
 
-```{r echo=TRUE}
+```{r}
 #|message: false 
 #|warning: false
 #|code-fold: true
@@ -66,7 +66,7 @@ table_creation<-function(x){
 
 Using the `get_imdb_file`function we are loading all the required DATASETS
 
-```{r echo=TRUE}
+```{r}
 #|eval: false
 #|label: 'get_imdb_file function'
 #|code-fold: true
@@ -87,8 +87,6 @@ get_imdb_file <- function(fname){
 ```
 
 ```         
-#|eval: false
-#|code-fold: true
 TITLE_BASICS<- get_imdb_file("title.basics")
 TITLE_PRINCIPALS <- get_imdb_file("title.principals")
 TITLE_EPISODES   <- get_imdb_file("title.episode")
@@ -97,7 +95,7 @@ TITLE_RATINGS    <- get_imdb_file("title.ratings")
 TITLE_CREW       <- get_imdb_file("title.crew")
 ```
 
-```{r echo=FALSE}
+```{r}
 #|eval: false
 
 NAME_BASICS<-read.csv( "~/STA9750-2024-FALL/NAME_BASICS.csv")
@@ -116,7 +114,7 @@ TITLE_PRINCIPALS1<-read.csv( "~/STA9750-2024-FALL/TITLE_PRINCIPALS.csv")
 The `NAME_BASICS` dataset is filtered to only include rows where the `knownForTitles` column contains more than one title (indicated by the presence of more than one comma). This step ensures that only individuals known for multiple works are retained.\
 Similarly, `TITLE_RATINGS` are filtered with `numVotes`\>100.
 
-```{r echo=TRUE}
+```{r}
 #|eval: false
 #|code-fold: true
 NAME_BASICS <- NAME_BASICS |> 
@@ -157,9 +155,9 @@ TITLE_PRINCIPALS1 <- TITLE_PRINCIPALS1 |> semi_join(TITLE_RATINGS, join_by(tcons
 
 :::
 
-Correct the column types of the TITLE tables using a combination of mutate and the coercion functions as.numeric and as.logical..
+Correct the column types of the `TITLE BASICS` tables using a combination of mutate and the coercion functions as.numeric and as.logical..
 
-```{r warning=FALSE}
+```{r}
 #| message: false 
 #| warning: false
 #| code-fold: true
@@ -183,7 +181,7 @@ TITLE_BASICS <- TITLE_BASICS |>
     TRUE ~ "Others"  # Assign "Others" to all non-relevant genres
   ))
 ```
-
+`NAME BASICS` also needs the `birthYear and deathYear` changed to as.numeric
 ```{r warning=FALSE}
 #| message: false 
 #| warning: false
@@ -193,7 +191,7 @@ NAME_BASICS <- NAME_BASICS |>
            deathYear = as.numeric(deathYear))
 
 ```
-
+`TITLE_CREW` has multiple directors names in a single cell. it has to be separated.
 ```{r}
 #| message: false 
 #| warning: false
@@ -202,7 +200,7 @@ NAME_BASICS <- NAME_BASICS |>
 TITLE_CREW<-TITLE_CREW |> separate_longer_delim(directors, ",")
 
 ```
-
+`TITLE EPISODES` also needs the season number and episode number changed to numeric.
 ```{r}
 #| message: false 
 #| warning: false
@@ -213,7 +211,8 @@ TITLE_EPISODES<-TITLE_EPISODES|>mutate(
            episodeNumber=as.numeric(episodeNumber))
 ```
 
-::: callout-tipout
+::: callout-tip
+
 #### Task 2: Instructor-Provided Questions
 
 1.  How many movies are in our data set? How many TV series? How many TV episodes?
@@ -222,8 +221,9 @@ TITLE_EPISODES<-TITLE_EPISODES|>mutate(
 4.  What four projects is the actor Mark Hamill most known for?
 5.  What TV series, with more than 12 episodes, has the highest average rating?
 6.  The TV series *Happy Days* (1974-1984) gives us the common idiom ["jump the shark"](https://en.wikipedia.org/wiki/Jumping_the_shark). The phrase comes from a controversial fifth season episode (aired in 1977) in which a lead character literally jumped over a shark on water skis. Idiomatically, it is used to refer to the moment when a once-great show becomes ridiculous and rapidly looses quality. Is it true that episodes from later seasons of *Happy Days* have lower average ratings than the early seasons?
-:::
 
+:::
+**1.Number of Projects in the TITLE_BASICS **
 ```{r}
 #| message: false 
 #| warning: false
@@ -231,7 +231,7 @@ TITLE_EPISODES<-TITLE_EPISODES|>mutate(
 table(TITLE_BASICS$titleType)
 ```
 
-I write a function`count_title` to identify the project type and count.
+There are mutliple entries for movies(TV movie, movies) and series (TV Series, series). Hence, I wrote a function`count_title` to identify the project type and count.
 
 ```{r echo=TRUE}
 #|message: false 
@@ -244,6 +244,7 @@ count_title<-function(x){
 }
 ```
 
+I used the `count_title` function to identify `movies`,`series`,`episodes` in the `TITLE_BASICS` dataset
 ```{r}
 #|message: false 
 #|warning: false
@@ -254,7 +255,8 @@ episode_count<-count_title("episode")
 print(paste0("There are ", movie_count, " movies, ", series_count, " series and ", episode_count, " episodes in the TITLE_BASICS dataset."))
 ```
 
-2.According to [wikipedia](https://en.wikipedia.org/wiki/List_of_oldest_living_people), the oldest person alive in the world is of 1908 onwards. Hence, I keep checked for people who are born on 1908 and afterwards, and who doesn't a death year
+**2.Oldest Person Alive **
+According to [wikipedia](https://en.wikipedia.org/wiki/List_of_oldest_living_people), the oldest person alive in the world is of 1908 onwards. Hence, I keep checked for people who are born on 1908 and afterwards, and who doesn't a death year
 
 ```{r echo=TRUE}
 #|message: false 
@@ -267,7 +269,7 @@ NAME_BASICS|>select(-knownForTitles)|>
 
 There are 111 individuals who were born in the year 1911.
 
-**PERFECT RATED EPISODE**
+**3.PERFECT RATED EPISODE**
 
 ```{r echo=TRUE}
 #| message: false 
@@ -287,7 +289,7 @@ table_creation(perfect_episode|>
 
 The perfect rated TV episode is [Ozymandias](https://www.imdb.com/title/tt2301451/) which is the 14th Episode in Season 5 of Breaking Bad TV Series.
 
-**FIND PROJECTS OF ANY ACTOR OR DIRECTOR**
+**4.FIND PROJECTS OF ANY ACTOR OR DIRECTOR**
 
 I wrote a function `find_projects` which takes `actor_or_director` name as a parameter and returns all the projects they have been part of.
 
@@ -325,7 +327,7 @@ ALL_TITLES<-full_join(
 sample_n(ALL_TITLES,100)|>DT::datatable()
 ```
 
-I gathered crew information by combining `TITLE_CREW` (containing director data) and `TITLE_PRINCIPALS1` (with principal actor information) to create ALL_CREW, which included both directors and actors. To link this data with individual crew members, I merged the `ALL_CREW` dataset with the NAME_BASICS dataset, which includes `actors` and `directors` known projects and names.
+I gathered crew information by combining `TITLE_CREW` (containing director data) and `TITLE_PRINCIPALS1` (with principal actor information) to create ALL_CREW, which included both directors and actors. 
 
 ```{r}
 #| label: 'all-crew'
@@ -345,7 +347,7 @@ rm(TITLE_RATINGS_CREW_1,TITLE_RATING_CREW_2)
 
 sample_n(ALL_CREW,10)|> DT::datatable()
 ```
-
+To link this data with individual crew members, I merged the `ALL_CREW` dataset with the NAME_BASICS dataset, which includes `actors` and `directors` known projects and names.
 ```{r}
 #| label: 'ALL_CREW_Full_Join'
 #| eval: true
@@ -360,6 +362,7 @@ sample_n(ALL_CREW,10)|>DT::datatable()
 
 ```
 
+Here is the `Find_Projects` function:
 ```{r}
 #| label: 'function find Projects'
 #| eval: true
@@ -383,7 +386,7 @@ find_projects<-function(actor_or_director){
 }
 ```
 
-**MARK HAMIL'S FAMOUS PROJECTS**
+**4.1: MARK HAMIL'S FAMOUS PROJECTS**
 
 I developed a function called `find_projects` that takes the name of an actor or director as input (in this case, "Mark Hamill"). The function filters the combined dataset (ALL_CREW) to find all projects associated with the specified person, including those in the `knownForTitles` column. The function then searches for these titles in the `ALL_TITLES` dataset to return the relevant projects
 
@@ -398,7 +401,9 @@ find_projects(name)|>select(primaryTitle,averageRating,numVotes)|>distinct()|>
 
 Based on the above analysis and functions, we find that Mark Hamill is famously known for the following four film/TV Series projects, which are Star Wars movies, The Batman Animated movies,Scooby Doo Animated Series and Avatar:The Last Airbender animated series. Mark Hamill is prestigious to be included in these film projects as they are highly rated and loved by the fans, especially Star Wars movies, The Last Airbender Animated Series and the Batman Animated movies.
 
-**HIGHEST RATED SERIES**
+**5.HIGHEST RATED SERIES**
+
+I joined ALL_TITLES and TITLE_EPISODES to create a new dataset known as 'SERIES`
 
 ```{r echo=TRUE}
 #| message: false 
@@ -414,7 +419,7 @@ SERIES <- right_join(
     select(-tconst),                # Drop the tconst column
   by = c("tconst" = "parentTconst") )
 ```
-
+I used word cloud to print the titles based on the number of Votes
 ```{r echo=TRUE}
 #| message: false 
 #| warning: false
@@ -434,7 +439,7 @@ rect(-1, -1, 1, 1, border = "black", lwd = 5)
 ```
 
 ```{r}
-SERIES|>DT::datatable()
+SERIES|>DT::datatable(caption = "Highly Rated Series")
 ```
 
 As seen from the above table, Breaking Bad ranks the first among the top ten TV series, that has the highest number of votes and rated well by the critics. It deserves to be rated as the highest because of the thrilling intensity, it gives the viewers as well as the way they show each of the character development and growth through each of the episode and season.
@@ -455,7 +460,7 @@ Validate your success metric as follows:
 5.  Come up with a numerical threshold for a project to be a 'success'; that is, determine a value $v$ such that movies above $v$ are all "solid" or better.
 :::
 
-**SUCCESS METRICS**
+**1.SUCCESS METRICS**
 
 Design a ‘success’ measure for IMDb entries, reflecting both quality and broad popular awareness. Implement your success metric using a mutate operator to add a new column to the TITLE_RATINGS table.
 
@@ -476,7 +481,7 @@ The term averageRating \* numVotes gives the total sum of the ratings. Adding 1 
 ALL_TITLES<-ALL_TITLES|>mutate(new_rating=round((averageRating*numVotes+1)/(numVotes+2),3))
 ```
 
-**High Votes, High Ratings: The Movies Everyone Watched And Everyone Liked**
+**2.High Votes, High Ratings: The Movies Everyone Watched And Everyone Liked**
 
 I used the function `identify_title` to filter movies
 
@@ -491,7 +496,7 @@ identify_title<-function(df,word){
 
 ```
 
-`highest_top_50` function was developed to identify and retrieve the top 50 movies based on the number of votes and ratings. This function takes a dataframe as input, arranges the data in descending order by `numVotes` and `new_rating`, and returns the top 50 entries while excluding the columns `averageRating`, `tconst`, and `titleType` from the output. Next, the dataset `movies_rated` was generated by using the `identify_title` function to filter movie titles from the `ALL_TITLES` dataset, ensuring only distinct rows were included, and removing the `genre_cleaned` column. The `highest_top_50` function was then applied to this dataset, and the result was passed to the `table_creation` function, which produced an interactive table using the `DT` package to display the top 50 movies based on votes and ratings.
+`highest_top_50` function was developed to identify and retrieve the top 50 movies based on the number of votes and ratings. This function takes a dataframe as input, arranges the data in descending order by `numVotes` and `new_rating`, and returns the top 50 entries while excluding the columns `averageRating`, `tconst`, and `titleType` from the output. 
 
 ```{r echo=TRUE}
 #| message: false 
@@ -505,7 +510,7 @@ highest_top_50<-function(df)
     select(-averageRating,-tconst,-titleType)
 }
 ```
-
+Next, the dataset `movies_rated` was generated by using the `identify_title` function to filter movie titles from the `ALL_TITLES` dataset, ensuring only distinct rows were included, and removing the `genre_cleaned` column. The `highest_top_50` function was then applied to this dataset, and the result was passed to the `table_creation` function, which produced an interactive table using the `DT` package to display the top 50 movies based on votes and ratings.
 ```{r}
 #| message: false 
 #| warning: false
@@ -517,7 +522,7 @@ table_creation(highest_top_50(movies_rated|>select(-genre_cleaned,-X)|>distinct(
 
 ```
 
-**High Votes, Low Ratings: The Movies Everyone Watched But No One Liked**
+**3.High Votes, Low Ratings: The Movies Everyone Watched But No One Liked**
 
 To identify movies with a large number of IMDb votes but poor performance on the success metric, I sorted the movies_rated dataset by descending order of numVotes and filtered for movies with a new_rating of less than 5. The following code selects the top 10 movies fitting this criterion and excludes the columns tconst and titleType:
 
@@ -533,7 +538,7 @@ table_creation(movies_rated |>
 
 ```
 
-**TOM HANKS's MOVIES**
+**4.TOM HANKS's MOVIES**
 
 ```{r}
 #| message: false 
@@ -549,10 +554,11 @@ name="Tom Hanks"
 
 # Select relevant columns
 find_projects(name)|>select(primaryTitle,new_rating,numVotes)|>distinct()|>
-  arrange(desc(new_rating),desc(numVotes))|>DT::datatable()
+  arrange(desc(new_rating),desc(numVotes))|>DT::datatable(caption = "Tom Hanks Projects")
   
 ```
 
+Here is the Visual representation of Tom Hanks successes based on genres.
 ```{r}
 #| label: "successful_projects"
 #| message: false 
@@ -593,7 +599,7 @@ find_projects(name) |>
 
 [Tom Hanks](https://www.imdb.com/name/nm0000158/) is my favorite Actor.
 
-**Determining the Cutoff: What Makes a Movie 'Solid'?**
+**5.Determining the Cutoff: What Makes a Movie 'Solid'?**
 
 ```{r}
 #| message: false 
@@ -648,7 +654,7 @@ rm(TITLE_EPISODES_2)
 #| message: false 
 #| warning: false
 #| code-fold: true
-sample_n(ALL_TITLES,100)|>DT::datatable()
+sample_n(ALL_TITLES,10)|>DT::datatable()
 ```
 
 ### V.Examining Success by Genre and Decade
@@ -664,7 +670,7 @@ Using questions like the following, identify a good "genre" for your next film. 
 4.  What genre has become more popular in recent years?
 :::
 
-**Charting Success: Which Genre Dominated Each Decade?**
+**1.Charting Success: Which Genre Dominated Each Decade?**
 
 I filtered the `ALL_TITLES` dataset to create a new dataset called `success_project`s, containing only the titles marked as successful (where `success_metrics equals 1`). This data set was then prepared for further analysis. I also ensured the `startYear` column was numeric for accurate processing and examined a sample of successful projects.
 
@@ -723,9 +729,9 @@ The resulting cleaned dataset, `success_decade`, now contains distinct entries o
 #| warning: false
 #| code-fold: true
 library(tidyverse)
-sample_n(success_decade,100)|>DT::datatable()
+sample_n(success_decade,10)|>DT::datatable(caption = "sample of Success Decade Dataset")
 ```
-
+To visual total number of movies based on genre
 ```{r}
 #| label: 'No of Movies Based on Genres'
 #| message: false 
@@ -753,7 +759,7 @@ success_decade |>
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1,size = 6))
 ```
-
+Here is a word cloud of the genres based on the counts
 ```{r}
 #|warning: false
 
@@ -771,7 +777,7 @@ wordcloud(words = words$genre_cleaned, freq = words$genre_count,
 
 It is `Drama` category is been the most successes in all decades.
 
-**The Genre That Never Fails: A Consistent Success Story**
+**2.The Genre That Never Fails: A Consistent Success Story**
 
 To analyze the trends in movie genres over time regarding their success, we can examine the average ratings by genre for each decade. This will help us identify which genre has consistently had the most successes and which genre has fallen out of favor over the years.
 
@@ -846,7 +852,7 @@ ggplot( aes(x = decade, y = Average_Rating, color = decade)) +
 
 Throughout the decades, Drama has emerged as a dominant genre, enjoying sustained popularity across various eras. However, recent trends indicate that the audience's appetite for dramatic storytelling may be waning.
 
-**Quantity vs. Quality: The Genre with the Most Successes Since 2010**
+**3.Quantity vs. Quality: The Genre with the Most Successes Since 2010**
 
 The analysis reveals the total number of successes for each genre within the specified time frame. By grouping the data by genre_cleaned and success_metrics, we determined how many projects in each genre were classified as successful (success_metrics = 1) compared to non-successful (success_metrics = 0).
 
@@ -914,7 +920,7 @@ ggplot(x|>filter(success_metrics==1), aes(x = reorder(genre_cleaned,percentage),
 
 `Biography`, `Animation`, and `Documentary` genres emerge as the leaders in terms of success metrics when we look at the proportion of successful films. The disparity between the total number of successful projects in `Drama`, `Comedy`, and `Thriller` versus the success rates in `Biography`, `Animation`, and `Documentary` indicates that while traditional genres like Drama may produce a higher volume of successful films, newer or less conventional genres are achieving a greater proportion of success relative to their output. This suggests that these genres are not only producing fewer films but are also prioritizing quality and engagement, leading to better ratings and audience reception.
 
-**Emerging Favorites: The Rise of \[Genre\] in Recent Years**
+**4.Emerging Favorites: The Rise of \[Genre\] in Recent Years**
 
 ```{r}
 #| message: false 
