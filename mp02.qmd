@@ -14,7 +14,7 @@ format:
 [IV.Quantifying Success]\
 [V.Examining Success by Genre and Decade]\
 [VI.Successful Personnel in the Genre]\
-[VII.Nostalgia and Remakes]\
+[VII.Nostalgia and Remakes](#vii.-nostalgia-and-remakes)\
 [VIII.Movie Pitch]\
 
 ### I.Introduction
@@ -152,8 +152,9 @@ TITLE_PRINCIPALS1 <- TITLE_PRINCIPALS1 |> semi_join(TITLE_RATINGS, join_by(tcons
 
 ### III.Initial Exploration
 
-::: {callout-tip}
+::: callout-tip
 #### Task 1: Column Type Correction
+
 :::
 
 Correct the column types of the TITLE tables using a combination of mutate and the coercion functions as.numeric and as.logical..
@@ -212,7 +213,7 @@ TITLE_EPISODES<-TITLE_EPISODES|>mutate(
            episodeNumber=as.numeric(episodeNumber))
 ```
 
-::: {callout-tipout}
+::: callout-tipout
 #### Task 2: Instructor-Provided Questions
 
 1.  How many movies are in our data set? How many TV series? How many TV episodes?
@@ -1055,7 +1056,7 @@ The original film featured a phenomenal creative team, including David Lean (Dir
 
 ![credits:Tumblar](docs/movie.png){fig-align="center"}
 
-In analyzing trends of the [popularity](V.Examining Success by Genre and Decade) biographical and animated films have shown remarkable growth.They consistanly has average rating more than 6.5 every decade from 1940-now. Animation’s wide appeal across age groups—from children to adults—stems from its ability to highlight the beauty of everyday moments, turning them into deeply emotional and universally relatable stories. The format’s timeless appeal makes it perfect for projects that require both visual grandeur and intimate emotional depth.
+In analyzing trends of the popularity biographical and animated films have shown remarkable growth.They consistanly has average rating more than 6.5 every decade from 1940-now. Animation’s wide appeal across age groups—from children to adults—stems from its ability to highlight the beauty of everyday moments, turning them into deeply emotional and universally relatable stories. The format’s timeless appeal makes it perfect for projects that require both visual grandeur and intimate emotional depth.
 
 An animated *Lawrence of Arabia* with Pixar Animation Studios would blend the sweeping beauty of desert landscapes and Bedouin culture with the raw emotions of war, betrayal, and the human experience. With the rich, resonant voices of *Morgan Freeman*, *Benedict Cumberbatch*, and *Anthony Hopkins*, the film could stir powerful emotions and empathy in viewers. And under the direction of *Brad Bird*, known for The Incredibles and Wall-E, this project could win hearts worldwide.
 
