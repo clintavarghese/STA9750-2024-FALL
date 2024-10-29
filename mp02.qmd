@@ -264,10 +264,10 @@ According to [wikipedia](https://en.wikipedia.org/wiki/List_of_oldest_living_peo
 #|code-fold: true
 NAME_BASICS|>select(-knownForTitles)|>
   filter(birthYear==1908, is.na(deathYear))|>
-  distinct(primaryName, .keep_all = TRUE)|>select(primaryName,primaryProfession)|>DT::datatable()
+  distinct(primaryName, .keep_all = TRUE)|>select(primaryName,primaryProfession,birthYear)|>DT::datatable()
 ```
 
-There are 111 individuals who were born in the year 1911.
+There are 111 individuals who were born after 1908 and  still alive for birth year .
 
 **3.PERFECT RATED EPISODE**
 
@@ -540,6 +540,8 @@ table_creation(movies_rated |>
 
 **4.TOM HANKS's MOVIES**
 
+I have chosen **Tom Hanks** to check my metrics. [Tom Hanks](https://www.imdb.com/name/nm0000158/) is my favorite Actor. He is a successful actor with numerous oscar wins. List Tom Hanks’ top films and assess their success based on metrics like IMDb ratings, box office gross, and award wins. For example, Forrest Gump, Saving Private Ryan, and Cast Away have not only high IMDb scores but also substantial box office performance and critical acclaim. Lets see if those results are seen
+
 ```{r}
 #| message: false 
 #| warning: false
@@ -558,7 +560,7 @@ find_projects(name)|>select(primaryTitle,new_rating,numVotes)|>distinct()|>
   
 ```
 
-Here is the Visual representation of Tom Hanks successes based on genres.
+Here is the Visual representation of Tom Hanks successes based on genres. Hanks has won Oscars for Forrest Gump and Philadelphia and has been nominated for several other roles. By evaluating the IMDb rating of his Oscar-nominated films, you can confirm that his roles consistently perform well by your chosen metrics.
 ```{r}
 #| label: "successful_projects"
 #| message: false 
@@ -597,9 +599,8 @@ find_projects(name) |>
 
 ```
 
-[Tom Hanks](https://www.imdb.com/name/nm0000158/) is my favorite Actor.
 
-**5.Determining the Cutoff: What Makes a Movie 'Solid'?**
+**5.Determining the Cutoff: What Makes a Project 'Solid'?**
 
 ```{r}
 #| message: false 
