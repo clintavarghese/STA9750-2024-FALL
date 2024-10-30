@@ -1,0 +1,80 @@
+---
+title: "Do Proportional Electoral College Allocations Yield a More Representative Presidency?"
+editor: visual
+---
+
+# Table Of Contents 
+
+[I.Introduction]\
+
+jdfnb
+
+## I.Introduction 
+
+## II.Set-Up and Initial Exploration 
+
+### Data I: US House Election Votes from 1976 to 2022 
+
+### Data II: Congressional Boundary Files 1976 to 2012 
+
+### Data III: Congressional Boundary Files 2014 to Present 
+
+### Initial Exploration of Vote Count Data 
+
+::: {.callout-tip title="Task 3: Exploration of Vote Count Data"}
+Answer the following using the vote count data files from the MIT Election Data Science Lab. You may answer each with a table or plot as you feel is appropriate.
+
+1.  Which states have gained and lost the most seats in the US House of Representatives between 1976 and 2022?
+
+2.  New York State has a unique "fusion" voting system where one candidate can appear on multiple "lines" on the ballot and their vote counts are totaled. For instance, in 2022, Jerrold Nadler appeared on both the Democrat and Working Families party lines for NYS' 12th Congressional District. He received 200,890 votes total (184,872 as a Democrat and 16,018 as WFP), easily defeating Michael Zumbluskas, who received 44,173 votes across three party lines (Republican, Conservative, and Parent).
+
+    Are there any elections in our data where the election would have had a different outcome if the "fusion" system was not used and candidates only received the votes their received from their "major party line" (Democrat or Republican) and not their total number of votes across all lines?
+
+3.  Do presidential candidates tend to run ahead of or run behind congressional candidates in the same state? That is, does a Democratic candidate for president tend to get more votes in a given state than all Democratic congressional candidates in the same state?
+
+    Does this trend differ over time? Does it differ across states or across parties? Are any presidents particularly more or less popular than their co-partisans?
+:::
+
+### Importing and Plotting Shape File Data
+
+::: {.callout-tip title="Task 4: Automate Zip File Extraction"}
+Adapt the code after the `##-` symbol above into a *function* `read_shp_from_zip()` which takes in a file name, pulls out the `.shp` file contained there in, and reads it into `R` using `read_sf()`.
+
+*Note: If your platform supports it, you can also use a combination of `unzip(..., list=TRUE)` and `unzip(..., file=...)` to extract only one file out of the `zip` directory instead of unpacking the whole file. This is a bit more efficient, but not necessary here as all files involved are pretty small.*
+:::
+
+::: {.callout-tip title="Task 5: Chloropleth Visualization of 2000 Electoral College Results"}
+Using the data you downloaded earlier, create a *chloropleth* visualization of the 2000 electoral college results, coloring each state by the party that won the most votes in that state. Your result should look something like this:
+
+![](https://upload.wikimedia.org/wikipedia/commons/1/19/ElectoralCollege2000.svg)
+
+**Taken from [Wikipedia](https://en.wikipedia.org/wiki/2000_United_States_presidential_election)**
+
+It is not required, but to make the very best plot, you may want to look up:
+
+1)  How to "inset" Alaska and Hawaii instead of plotitng their true map locations.
+2)  How to add labels to a chloropleth in `ggplot2`
+3)  How to label the small states in the North-East
+
+but these steps are not required as they are a bit advanced.
+:::
+
+::: {.callout-tip title="Task 6: Advanced Chloropleth Visualization of Electoral College Results"}
+Modify your previous code to make either an *animated* version showing election results over time.
+:::
+
+##III.Comparing the Effects of ECV Allocation Rules\
+
+::: {.callout-tip title="Task 7: Evaluating Fairness of ECV Allocation Schemes"}
+Write a fact check evaluating the fairness of the different ECV electoral allocation schemes.
+
+To do so, you should first determine which allocation scheme you consider "fairest". You should then see which schemes give different results, if they ever do. To make your fact check more compelling, select one election where the ECV scheme had the largest impact--if one exists--and explain how the results would have been different under a different ECV scheme.
+
+As you perform your analysis, you may assume that the District of Columbia has three ECVs, which are allocated to the Democratic candidate under all schemes except possibly national popular vote.\[\^8\]
+:::
+
+##IV.Extra Credit Opportunity\
+
+::: {.callout-note title="Extra Credit Opportunity"}
+For extra credit, extend your analysis to 2024 electoral results. You will have to find a reliable source of 2024 state- or district-wide vote counts. If the 2024 election is close, this may not be easy to do between the election and the date this mini-project is due.
+:::
