@@ -75,7 +75,7 @@ skimr::skim(PRESIDENTIAL_VOTES)
 
 #### Data II: Congressional Boundary Files 
 
-#### 1.1976 to 2012 Congression Boundaries
+#### 1.Congression Boundaries
 
 Jeffrey B. Lewis, Brandon DeVine, Lincoln Pritcher, and Kenneth C. Martis have created shapefiles for all US congressional districts from 1789 to 2012; 
 I downloaded those shapefiles from 1976 to 2012 using `get_data` function using base [URL](https://cdmaps.polisci.ucla.edu/). 
@@ -118,45 +118,6 @@ dest_dir<-"~/STA9750-2024-FALL/MP-DATA/district_shapes/"
 
 get_data(dest_dir)
 ```
-
-
-##### ii.2014 to Present Boundary Files
-
-```
-#|warning: false
-#|message: false
-#|results: "hide" 
-# Check and load tigris package
-if(!require('tigris'))install.packages('tigris')
-library(tigris)
-library(leaflet)
-cd_list <- list()
-cd_files <- sprintf("cd%03d", 113:124)
-year <- 2013
-
-for (cd_file_name in cd_files) {
-  
-  if (year<2024)
-    {
-    
-  # Try to fetch congressional district data
-  cd <- congressional_districts(cb = TRUE, resolution = '20m', year = year)
-  
-  # Store data in the list
-  cd_list[[cd_file_name]] <- cd
-  }
-  # Increment year for the next iteration
-  year <- year + 1
-  
-}
-
-US_CONGRESSIONAL_BOUNDARIES2<-cd_list
-
-
-
-
-```
-
 
 
 ## III.Initial Exploration of Vote Count Data
@@ -505,7 +466,7 @@ theme(
   axis.title.y = element_blank(),
   strip.text = element_text(size = 14)  # Increase facet label size
 )+
-facet_wrap(~year, ncol = 2, scales = "fixed")  # `ncol = 2` ensures two maps per row
+facet_wrap(~year, scales = "fixed")  # `ncol = 2` ensures two maps per row
 
 
 
