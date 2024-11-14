@@ -7,6 +7,7 @@ format:
     toc: true
     code-fold: true
     
+    
 ---
 
 ## I.Introduction
@@ -26,7 +27,7 @@ This project aims to analyze how U.S. presidential election outcomes would diffe
 
 ### Loading necessary packages
 
-```{r}
+```{r,warning=FALSE,message=FALSE}
 #| warning: false
 #| message: false
 #| label: 'Set-Up and Initial Exploration'
@@ -50,26 +51,27 @@ library(gganimate)
 
 #### Data I: US House Election Votes and Presidential Election Votes from 1976 to 2022
 
-The [MIT Election Data Science Lab](https://electionlab.mit.edu/) collects votes from all biennial congressional races in all 50 states.The [US President Election]() and [House Of Representative Elections]() Dataset are downloaded.  
+The [MIT Election Data Science Lab](https://electionlab.mit.edu/) collects votes from all biennial congressional races in all 50 states.The [US President Election]() and [House Of Representative Elections]() Dataset are downloaded.[^1]
+[^1]:MIT Election Data and Science Lab, 2017, “U.S. House 1976–2022”, https://doi.org/10.7910/DVN/IG0UN2, Harvard Dataverse, V13, UNF:6 /IVldA== [fileUNF]
 
-```{r}
+```{r,warning=FALSE,message=FALSE}
 #| echo: false
 US_HOUSE_ELECTION_VOTES<-read.csv("~/STA9750-2024-FALL/MP-DATA/dataverse_files/1976-2022-house.csv")
 ```
 ##### initial exploration of the datasets
 
 ###### US HOUSE ELECTION DATSET
-```{r}
+```{r,warning=FALSE,message=FALSE}
 skimr::skim(US_HOUSE_ELECTION_VOTES)
 ```
 
-```{r}
+```{r,warning=FALSE,message=FALSE}
 #| echo: false
 PRESIDENTIAL_VOTES<-read.csv("~/STA9750-2024-FALL/MP-DATA/dataverse_files2/1976-2020-president.csv")
 
 ```
 ###### PRESIDENTIAL VOTES DATASET
-```{r}
+```{r,warning=FALSE,message=FALSE}
 skimr::skim(PRESIDENTIAL_VOTES)
 ```
 
@@ -81,7 +83,7 @@ Jeffrey B. Lewis, Brandon DeVine, Lincoln Pritcher, and Kenneth C. Martis have c
 I downloaded those shapefiles from 1976 to 2012 using `get_data` function using base [URL](https://cdmaps.polisci.ucla.edu/). 
 
 ##### i.get_data Function
-```{r}
+```{r,warning=FALSE,message=FALSE}
 #| label: 'Get Data Function'
 
 get_data<-function(destfile_dir){
@@ -114,7 +116,7 @@ file_names <- sprintf("districts%03d.zip", 95:112)
 dest_dir<-"~/STA9750-2024-FALL/MP-DATA/district_shapes/"  
 ```
 
-```{r}
+```{r,warning=FALSE,message=FALSE}
 
 get_data(dest_dir)
 ```
@@ -125,45 +127,38 @@ get_data(dest_dir)
 Now that all the necessary data has been imported and ready to use, we can begin exploring the information we have available to us. The following questions can be answered by exploring the data.
 
 ### 1.  Which states have gained and lost the most seats in the US House of Representatives between 1976 and 2022?
-```{r}
+```{r,warning=FALSE,message=FALSE}
 head(US_HOUSE_ELECTION_VOTES)|>DT::datatable()
 ```
 
 #### Subsetting US HOUSE ELECTION FOR YEAR 1976 and 2022
 
-```{r}
+```{r,warning=FALSE,message=FALSE}
 election_1976<-US_HOUSE_ELECTION_VOTES|>filter(year==1976)|>group_by(state)|>
   summarise(seat_count_1976 = n_distinct(district)+2)
-```
 
-```{r}
 election_2022<-US_HOUSE_ELECTION_VOTES|>filter(year==2022)|>group_by(state) %>%
   summarise(seat_count_2022 = n_distinct(district)+2)
-```
 
-```{r}
+#calculate the seat Changes
 seat_changes<-election_1976|>left_join(election_2022,by=c("state"="state"))|>mutate(change=seat_count_2022-seat_count_1976,state=tolower(state))|>arrange(change)
 ```
 
-```{r}
+```{r,warning=FALSE,message=FALSE}
 seat_changes|>select(state,seat_count_1976,seat_count_2022,change)|>
-  arrange(change)|>slice(1:5)
+  arrange(change)|>slice(1:5)|>DT::datatable(caption = " Top 5 States that lost Seats")
 ```
 
-```{r}
+```{r,warning=FALSE,message=FALSE}
 seat_changes|>select(state,seat_count_1976,seat_count_2022,change)|>
-  arrange(desc(change))|>slice(1:5)
+  arrange(desc(change))|>slice(1:5)|>DT::datatable(caption = "Top 5 States that gained seats")
 ```
-
-
-```{r}
+```{r,warning=FALSE,message=FALSE}
 #the center of the map is converted to a df
 state_centroids <- data.frame(state = tolower(state.name), center.x = state.center$x, center.y = state.center$y,area=state.area)
 #join the center point df and the seat_changes
 seat_changes<-seat_changes|>inner_join(state_centroids,by="state")
-```
 
-```{r}
  ggplot(seat_changes|>filter(change!=0), aes(x = center.x, y = center.y)) + 
           geom_polygon(data = map_data("state"),
                        aes(x = long, y = lat, group = group),
@@ -187,30 +182,25 @@ Electoral fusion was once widespread in the U.S. and legal in every state. Howev
 
 Lets check whether there are any elections in our data where the election would have had a different outcome if the “fusion” system was not used and candidates only received the votes their received from their “major party line” (Democrat or Republican) and not their total number of votes across all lines.
 
-#### i. **Calculate Total Votes per Candidate based on FUSION TICKET status**:\ 
 
 - The first line creates `house_election_winner` by starting with `US_HOUSE_ELECTION_VOTES`, then: - Groups the data by `year`, `state`,`candidate`.
 - Adds a new column `total_candidate_votes` that calculates the total votes each candidate received across all party lines if `fusion ticket=TRUE` else keep the `candidate votes` as is for the `total_candidate_votes` column. 
 - Selects only relevant columns: `year`, `state`, `district`, `candidate`, `party` and `total_candidate_votes`.
 
 
-```{r}
+```{r,warning=FALSE,message=FALSE}
+#### i. Calculate Total Votes per Candidate based on FUSION TICKET status:\ 
 house_election_filtered <- US_HOUSE_ELECTION_VOTES |>
   group_by(year, state, candidate) |>
   mutate(total_candidate_votes = ifelse(fusion_ticket == "TRUE", sum(candidatevotes), candidatevotes)) |>
   select(year, state, district, candidate, party, candidatevotes, total_candidate_votes,totalvotes)
-```
 #### ii. Results based on fusion ticket status is not taken into consideration
 
-```{r}
 no_fusion_impacted_results<-house_election_filtered|>filter(party %in% c("DEMOCRAT","REPUBLICAN"))|> group_by(year,state,district)|>slice_max(order_by=candidatevotes,n=1)|>rename(candidate_winner_by_party=candidate,represented_party=party)|>select(-total_candidate_votes)
-```
 #### iii. Results based on fusion ticket status is taken into consideration
-```{r}
-fusion_impacted_results<-house_election_filtered|>filter(party %in% c("DEMOCRAT","REPUBLICAN"))|> group_by(year,state,district)|>slice_max(order_by=total_candidate_votes,n=1)|>rename(orginal_winner=candidate,main_party=party)|>select(-candidatevotes)
-```
 
-```{r}
+fusion_impacted_results<-house_election_filtered|>filter(party %in% c("DEMOCRAT","REPUBLICAN"))|> group_by(year,state,district)|>slice_max(order_by=total_candidate_votes,n=1)|>rename(orginal_winner=candidate,main_party=party)|>select(-candidatevotes)
+###result change while comparing both
 election_results_change <- no_fusion_impacted_results |>
   left_join(fusion_impacted_results, by = c("year", "state", "district")) |>
   mutate(different_outcome = total_candidate_votes != candidatevotes) |>  # TRUE if total votes differ from candidate votes
@@ -220,16 +210,19 @@ election_results_change <- no_fusion_impacted_results |>
 election_results_change|>DT::datatable()
 ```
 
-```{r}
+
+When we check if the original winner and candidate winner by party are same, it is FALSE, indicating both are not same.
+```{r,warning=FALSE,message=FALSE}
 all(election_results_change$orginal_winner == election_results_change$candidate_winner_by_party)
 
 ```
-The results would have been different if it was not introduced.
+
+The results would have been different if fusion vote system was not introduced for HOUSE ELECTIONS. But for the Presidential Election, it does not matter.
 
 
 ### 3. Do Presidential Candidates Run Ahead of or Behind Congressional Candidates in the Same State?
 
-```{r}
+```{r,warning=FALSE,message=FALSE}
 
 ```
 
@@ -241,7 +234,7 @@ Earlier we downloaded zip files for the US congressional districts.
 In order to access the shapefiles, we can automate a zip file extraction with some code using `read_shp_from_zip` function.
 
 #### i.read_shp_from_zip Function
-```{r}
+```{r,warning=FALSE,message=FALSE}
 #| label: 'Read Shape From Zip Function'
 #Task 4
 read_shp_from_zip<-function(zippedURL)
@@ -257,7 +250,7 @@ return(boundaries_sf)
 ```
 using `con_boundaries FUNCTION` function, I read the .shp files from the zip content and are stores as a list.
 #### ii.con_boundaries FUNCTION
-```{r}
+```{r,warning=FALSE,message=FALSE}
 #|label: 'con_boundaries function'
 #|warning: false
 con_boundaries<-function(dest_dir){
@@ -287,7 +280,7 @@ a chloropleth visualization of the electoral college results for the 2000 presid
 
 
 #### i.Subsetting PRESIDENTIAL VOTES and HOUSE ELECTION VOTES FOR YEAR 2000 and Finding the Winners
-```{r}
+```{r message=FALSE,warning=FALSE}
 #subsetting presidential vote for year 2000
 presidential_votes2000<-PRESIDENTIAL_VOTES|>filter(year==2000)|>group_by(state)|>slice_max(candidatevotes)
 
@@ -304,7 +297,7 @@ presidential_votes2000<-presidential_votes2000|>group_by(state,candidate)|>slice
 
 ```
 #### ii.Choosing District Shape File
-```{r}
+```{r,warning=FALSE,message=FALSE}
 #106th congress district shape files are selected.
 district_shapes2000<-US_CONGRESSIONAL_BOUNDARIES1$cd106|>select(STATENAME,ID, DISTRICT,geometry)
 #validating the geometry of district shape file and finding the center of each state
@@ -322,7 +315,7 @@ states_shapes2000<-district_shapes2000|>select(STATENAME,geometry)|>
   filter(!is.na(geometry))
 ```
 ### iii. Joining election results  and shapefiles
-```{r}
+```{r,warning=FALSE,message=FALSE}
 #joining 2000 congressional district election result and district shapefile
 election_2000_winner<-election_2000_winner|>select(state,district,main_party,total_candidate_votes,totalvotes)|>mutate(state=tolower(state),district=as.character(district))|>left_join(district_shapes2000|>mutate(STATENAME=tolower(STATENAME)),join_by("state"=="STATENAME","district"=="DISTRICT"))
 
@@ -348,7 +341,7 @@ election_2000_winner_sf <- st_as_sf(election_2000_winner)
 ### Election results by Congressional district 2000
 
 #### iv. Interactive Map to Include `Alaska` and `Hawaii` for Congressional District Win
-```{r}
+```{r,warning=FALSE,message=FALSE}
 library(leaflet)
 party_colors <- colorFactor(palette = c("blue", "red","white"), 
                             levels = c("DEMOCRAT", "REPUBLICAN","OTHER"))
@@ -373,11 +366,11 @@ leaflet(election_2000_winner_sf) |>
 ```
 
 #### v. Election results by Congressional district 2000 Static
-```{r}
+```{r,warning=FALSE,message=FALSE}
 # Static Plot for the 2000 election result
 ggplot(election_2000_winner_sf) +
   geom_sf(aes(fill = main_party), color = "white") +
- # geom_text(aes(x = centroid_x, y = centroid_y, label = state), size = 3, color = "black") +
+ geom_text(aes(x = centroid_x, y = centroid_y, label = state), size = 3, color = "black") +
   scale_fill_manual(values = c("DEMOCRAT" = "blue", "REPUBLICAN" = "red")) +
   coord_sf(xlim = c(-130, -60), ylim = c(24, 50))  +
   labs(fill = "Winning Party",
@@ -390,7 +383,7 @@ ggplot(election_2000_winner_sf) +
 
 ### 2000 Electoral College Map By State
 #### vi. Interactive map to include Alaska and Hawaii
-```{r}
+```{r,warning=FALSE,message=FALSE}
 library(sf)
 library(dplyr)
 
@@ -426,7 +419,7 @@ leaflet(us_states_sf) %>%
 ```
 
 #### vii. Electoral College Map For year 2000
-```{r}
+```{r,warning=FALSE,message=FALSE}
 
 # Plot the data
 ggplot(us_states_2000) +
@@ -444,7 +437,7 @@ ggplot(us_states_2000) +
 ## IV. Election Results Over The Time
 
 
-```{r}
+```{r,warning=FALSE,message=FALSE}
 #presidential winner by state for each year from 1976 to 2020
 presidential_winners_by_state<-PRESIDENTIAL_VOTES|>select(year,state,candidatevotes,candidate,party_simplified)|>
   group_by(year,state)|>
@@ -474,7 +467,7 @@ facet_wrap(~year, scales = "fixed")  # `ncol = 2` ensures two maps per row
 
 
 ### i.State-Wide Winner-Take-All
-```{r}
+```{r,warning=FALSE,message=FALSE}
 # Evaluating Fairness of ECV Allocation Schemes
 
 # Calculate electoral votes for each state by year (Reps + 2 votes for senators)
@@ -530,7 +523,7 @@ datatable(
 ```
 
 ### ii.District-Wide Winner-Take-All + State-Wide “At Large” Votes
-```{r}
+```{r,warning=FALSE,message=FALSE}
 # find number of districts each party won to represent electoral votes won in each state
 district_winner <- fusion_impacted_results |>
   group_by(year, state, district) |>
@@ -573,7 +566,7 @@ datatable(setNames(district_wide_winner_take_all, c("Year", "Winning Candidate",
 )
 ```
 ### iii.State-Wide Proportional
-```{r}
+```{r,warning=FALSE,message=FALSE}
 # find the number of electoral votes received by each candidate
 
 state_wide_proportional <- state_winner_results |>
@@ -596,12 +589,12 @@ state_wide_proportional_winner|>filter(party_simplified!="OTHER")|>DT::datatable
 
 ```
 
-
-```
+### iv. Nation-Wide Proportional
+```{r,warning=FALSE,message=FALSE}
 # find total number of electoral votes available
-electoral_votes_available <- electoral_votes_by_state |>
+electoral_votes_available <- electoral_votes_per_state |>
   group_by(year) |>
-  summarize(electoral_college_votes = sum(electoral_votes))
+  summarize(total_college_votes = sum(electoral_college_votes))
 
 # find percentage of popular vote each candidate received
 national_proportional <-PRESIDENTIAL_VOTES |>
@@ -618,15 +611,15 @@ national_proportional <-PRESIDENTIAL_VOTES |>
     electoral_votes_available,
     join_by(year == year)
   ) |>
-  mutate(electoral_votes_received = round(percentage_population_vote * electoral_college_votes, digits = 0)) |>
-  select(-percentage_population_vote, -electoral_college_votes) |>
+  mutate(electoral_votes_received = round(percentage_population_vote * total_college_votes, digits = 0)) |>
+  select(-percentage_population_vote, -total_college_votes) |>
   group_by(year) |>
   slice_max(order_by = electoral_votes_received, n = 1, with_ties = FALSE) |>
   rename(winner = candidate)
 
 datatable(setNames(national_proportional, c("Year", "Winning Candidate", "Electoral Votes")),
           options = list(pageLength = 12, autoWidth = TRUE),
-          caption = "Table 8: National Proportional: Presidential Winning Candidate"
+          caption = "National Proportional: Presidential Winning Candidate"
 )
 ```
 
