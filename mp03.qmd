@@ -153,6 +153,7 @@ seat_changes|>select(state,seat_count_1976,seat_count_2022,change)|>
 seat_changes|>select(state,seat_count_1976,seat_count_2022,change)|>
   arrange(desc(change))|>slice(1:5)|>DT::datatable(caption = "Top 5 States that gained seats")
 ```
+
 ```{r,warning=FALSE,message=FALSE}
 #the center of the map is converted to a df
 state_centroids <- data.frame(state = tolower(state.name), center.x = state.center$x, center.y = state.center$y,area=state.area)
@@ -248,7 +249,7 @@ boundaries_sf <- read_sf(fname_shp)
 return(boundaries_sf)
 }
 ```
-using `con_boundaries FUNCTION` function, I read the .shp files from the zip content and are stores as a list.
+using `con_boundaries FUNCTION` function, I read the .shp files from the zip content and are stored as a list.
 #### ii.con_boundaries FUNCTION
 ```{r,warning=FALSE,message=FALSE}
 #|label: 'con_boundaries function'
@@ -292,7 +293,7 @@ election_2000_winner<-fusion_impacted_results|>filter(year==2000)
 total_seats<-election_2000_winner|>select(state,district)|>group_by(state)|>mutate(no_of_seats=n_distinct(district)+2)|>select(state,no_of_seats)|>unique()
 
 #finding 2000 presidential election winner for each state 
-presidential_votes2000<-presidential_votes2000|>group_by(state,candidate)|>slice_max(candidatevotes)|>select(state,candidate,party_simplified,candidatevotes,totalvotes)|>
+presidential_votes2000<-presidential_votes2000|>group_by(state,candidate)|>slice_max(candidatevotes)|>select(year,state,candidate,party_simplified,candidatevotes,totalvotes)|>
   left_join(total_seats,by=c("state"="state"))
 
 ```
@@ -370,7 +371,7 @@ leaflet(election_2000_winner_sf) |>
 # Static Plot for the 2000 election result
 ggplot(election_2000_winner_sf) +
   geom_sf(aes(fill = main_party), color = "white") +
- geom_text(aes(x = centroid_x, y = centroid_y, label = state), size = 3, color = "black") +
+ #geom_text(aes(x = centroid_x, y = centroid_y, label = state), size = 3, color = "black") +
   scale_fill_manual(values = c("DEMOCRAT" = "blue", "REPUBLICAN" = "red")) +
   coord_sf(xlim = c(-130, -60), ylim = c(24, 50))  +
   labs(fill = "Winning Party",
@@ -388,14 +389,13 @@ library(sf)
 library(dplyr)
 
 # Filter and convert unsupported geometries
-us_states_sf <- us_states_2000 %>%
+us_states_2000 <- us_states_2000 %>%
   filter(!is.na(geometry), !is.na(party_simplified)) %>%
   st_make_valid() %>%  # Ensure geometries are valid
   st_cast("MULTIPOLYGON")  # Convert to MULTIPOLYGON if needed
 #st_write(us_states_sf,"us_states_sf.shp")
 
-
-leaflet(us_states_sf) %>%
+leaflet(us_states_2000) %>%
   addTiles() %>%
   addPolygons(
     fillColor = ~party_colors(party_simplified),
@@ -443,12 +443,12 @@ presidential_winners_by_state<-PRESIDENTIAL_VOTES|>select(year,state,candidatevo
   group_by(year,state)|>
   slice_max(candidatevotes)
 
+us_map=map_data("state")
 #combining the presidential winner by state for each year with us states boundary sf
-presidentials_winners_combined_sf<-presidential_winners_by_state|>select(year,state,party_simplified)|>left_join(us_states_sf|>select(STATENAME,geometry)|>mutate(STATENAME=toupper(STATENAME)),by=c("state"="STATENAME"))
-
+presidentials_winners_combined_sf<-presidential_winners_by_state|>select(year,state,party_simplified)|>left_join(us_map|>mutate(STATENAME=toupper(region)),by=c("state"="STATENAME"))
 #creating a facet wrap map for the results 
 ggplot(presidentials_winners_combined_sf) +
-  geom_sf(aes(geometry=geometry,fill = party_simplified), color = "white") +
+  geom_polygon(aes(x=long,y=lat,group=group, fill = party_simplified), color = "white") +
   scale_fill_manual(values = c("DEMOCRAT" = "blue", "REPUBLICAN" = "red")) +
   coord_sf(xlim = c(-130, -60), ylim = c(24, 50))  +
   labs(fill = "Winning Party") +
@@ -456,10 +456,9 @@ ggplot(presidentials_winners_combined_sf) +
 theme(
   legend.position = "bottom",
   axis.title.x = element_blank(),
-  axis.title.y = element_blank(),
-  strip.text = element_text(size = 14)  # Increase facet label size
-)+
-facet_wrap(~year, scales = "fixed")  # `ncol = 2` ensures two maps per row
+  axis.title.y = element_blank()
+  )+
+facet_wrap(~year)  # `ncol = 2` ensures two maps per row
 
 
 
