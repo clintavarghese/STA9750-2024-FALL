@@ -6,15 +6,19 @@ website:
   title: "CLINTA PUTHUSSERY VARGHESE"
   description:
     Course Projects for STA 9750 at Baruch College
-   site-url:https://clintavarghese.github.io/STA9750-2024-FALL/index.html
-   repo-url:https://github.com/clintavarghese/STA9750-2024-FALL
+   site-url:"https://clintavarghese.github.io/STA9750-2024-FALL/""
+   repo-url:"https://github.com/clintavarghese/STA9750-2024-FALL/"
    repo-actions:[edit, source, issue]
   navbar:
     background: primary
-    search: true
+    left:
+      - href: index.qmd
+        text: Home
+      - mini.qmd
     
 format:
   html:
-    theme:
-        - darkly
-    toc: false
+    theme: zephyr
+    css: styles.css
+    toc: true
+    page-layout: full

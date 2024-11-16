@@ -1,7 +1,20 @@
 ---
-title: "CLINTA PUTHUSSERY VARGHESE"
-editor: visual
+title: "Clinta Puthussery Varghese"
+image: media/headshot.jpg
+toc: false
+about: 
+  template: jolla
+  image-shape: round
+  image-width: 17em
+  links:
+    - text: LinkedIn
+      href: https://www.linkedin.com/in/clintavarghese/
+    - text: GitHub
+      href: https://github.com/clintavarghese/
+    - text: Email
+      href: mailto:clintav2@gmail.com
 ---
+        
 Welcome!
 Hello and welcome to my website! My name is Clinta Puthussery Varghese.
 
