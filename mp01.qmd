@@ -5,6 +5,7 @@ author:
   
 format:
   html: 
+    code-fold: true
     toc: true
 ---
 
@@ -56,7 +57,7 @@ After importing the data, several unnecessary columns were dropped to keep the d
 
 To extract monthly financials such as Total Fares and Expenses for each mode, A new dataset (`FINANCIALS`) is created by joining Fare Revenue (`FARES`), Operating Expenses (`EXPENSES`). It contains (`NTD ID`, `Agency Name` , `Mode`, `Total Fares`, `Expenses`)
 
-```{r,echo = FALSE, results = 'hide',warning=FALSE}
+```{r,results = 'hide',warning=FALSE}
 FARES <- FARES|>
     select(-`State/Parent NTD ID`, 
            -`Reporter Type`,
@@ -91,7 +92,7 @@ FINANCIALS <- inner_join(FARES, EXPENSES, join_by(`NTD ID`, `Mode`))
 
 Similarly to extract monthly transits numbers such as Unlinked Passenger Trip and Vehicle Revenue Miles for each agency and mode, a new data set USAGE(`USAGE`) is created by joining TRIPS (`TRIPS`) and MILES (`MILES`). It contains (`NTD ID`,`Agency` ,`UZA Name`,`Mode`,`3 Mode`,`month`,`UPT`, `VRM` )
 
-```{r, echo = FALSE, results = 'hide',message=FALSE}
+```{r, results = 'hide',message=FALSE}
 TRIPS <- TRIPS |>
             filter(`Mode/Type of Service Status` == "Active") |>
             select(-`Legacy NTD ID`, 

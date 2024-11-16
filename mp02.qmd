@@ -3,7 +3,9 @@ title: "Mini Project #2: IMDB Dataset Analysis"
 editor: visual
 format:
   html: 
-    code-link: true
+    code-fold: true
+    toc: true
+    
 ---
 
 ## Table of Contents
@@ -152,7 +154,6 @@ TITLE_PRINCIPALS1 <- TITLE_PRINCIPALS1 |> semi_join(TITLE_RATINGS, join_by(tcons
 
 ::: callout-tip
 #### Task 1: Column Type Correction
-
 :::
 
 Correct the column types of the `TITLE BASICS` tables using a combination of mutate and the coercion functions as.numeric and as.logical..
@@ -181,7 +182,9 @@ TITLE_BASICS <- TITLE_BASICS |>
     TRUE ~ "Others"  # Assign "Others" to all non-relevant genres
   ))
 ```
+
 `NAME BASICS` also needs the `birthYear and deathYear` changed to as.numeric
+
 ```{r warning=FALSE}
 #| message: false 
 #| warning: false
@@ -191,7 +194,9 @@ NAME_BASICS <- NAME_BASICS |>
            deathYear = as.numeric(deathYear))
 
 ```
+
 `TITLE_CREW` has multiple directors names in a single cell. it has to be separated.
+
 ```{r}
 #| message: false 
 #| warning: false
@@ -200,7 +205,9 @@ NAME_BASICS <- NAME_BASICS |>
 TITLE_CREW<-TITLE_CREW |> separate_longer_delim(directors, ",")
 
 ```
+
 `TITLE EPISODES` also needs the season number and episode number changed to numeric.
+
 ```{r}
 #| message: false 
 #| warning: false
@@ -212,7 +219,6 @@ TITLE_EPISODES<-TITLE_EPISODES|>mutate(
 ```
 
 ::: callout-tip
-
 #### Task 2: Instructor-Provided Questions
 
 1.  How many movies are in our data set? How many TV series? How many TV episodes?
@@ -221,9 +227,10 @@ TITLE_EPISODES<-TITLE_EPISODES|>mutate(
 4.  What four projects is the actor Mark Hamill most known for?
 5.  What TV series, with more than 12 episodes, has the highest average rating?
 6.  The TV series *Happy Days* (1974-1984) gives us the common idiom ["jump the shark"](https://en.wikipedia.org/wiki/Jumping_the_shark). The phrase comes from a controversial fifth season episode (aired in 1977) in which a lead character literally jumped over a shark on water skis. Idiomatically, it is used to refer to the moment when a once-great show becomes ridiculous and rapidly looses quality. Is it true that episodes from later seasons of *Happy Days* have lower average ratings than the early seasons?
-
 :::
-**1.Number of Projects in the TITLE_BASICS **
+
+**1.Number of Projects in the TITLE_BASICS**
+
 ```{r}
 #| message: false 
 #| warning: false
@@ -245,6 +252,7 @@ count_title<-function(x){
 ```
 
 I used the `count_title` function to identify `movies`,`series`,`episodes` in the `TITLE_BASICS` dataset
+
 ```{r}
 #|message: false 
 #|warning: false
@@ -255,8 +263,7 @@ episode_count<-count_title("episode")
 print(paste0("There are ", movie_count, " movies, ", series_count, " series and ", episode_count, " episodes in the TITLE_BASICS dataset."))
 ```
 
-**2.Oldest Person Alive **
-According to [wikipedia](https://en.wikipedia.org/wiki/List_of_oldest_living_people), the oldest person alive in the world is of 1908 onwards. Hence, I keep checked for people who are born on 1908 and afterwards, and who doesn't a death year
+**2.Oldest Person Alive** According to [wikipedia](https://en.wikipedia.org/wiki/List_of_oldest_living_people), the oldest person alive in the world is of 1908 onwards. Hence, I keep checked for people who are born on 1908 and afterwards, and who doesn't a death year
 
 ```{r echo=TRUE}
 #|message: false 
@@ -267,7 +274,7 @@ NAME_BASICS|>select(-knownForTitles)|>
   distinct(primaryName, .keep_all = TRUE)|>select(primaryName,primaryProfession,birthYear)|>DT::datatable()
 ```
 
-There are 111 individuals who were born after 1908 and  still alive for birth year .
+There are 111 individuals who were born after 1908 and still alive for birth year .
 
 **3.PERFECT RATED EPISODE**
 
@@ -327,7 +334,7 @@ ALL_TITLES<-full_join(
 sample_n(ALL_TITLES,100)|>DT::datatable()
 ```
 
-I gathered crew information by combining `TITLE_CREW` (containing director data) and `TITLE_PRINCIPALS1` (with principal actor information) to create ALL_CREW, which included both directors and actors. 
+I gathered crew information by combining `TITLE_CREW` (containing director data) and `TITLE_PRINCIPALS1` (with principal actor information) to create ALL_CREW, which included both directors and actors.
 
 ```{r}
 #| label: 'all-crew'
@@ -347,7 +354,9 @@ rm(TITLE_RATINGS_CREW_1,TITLE_RATING_CREW_2)
 
 sample_n(ALL_CREW,10)|> DT::datatable()
 ```
+
 To link this data with individual crew members, I merged the `ALL_CREW` dataset with the NAME_BASICS dataset, which includes `actors` and `directors` known projects and names.
+
 ```{r}
 #| label: 'ALL_CREW_Full_Join'
 #| eval: true
@@ -363,6 +372,7 @@ sample_n(ALL_CREW,10)|>DT::datatable()
 ```
 
 Here is the `Find_Projects` function:
+
 ```{r}
 #| label: 'function find Projects'
 #| eval: true
@@ -403,7 +413,7 @@ Based on the above analysis and functions, we find that Mark Hamill is famously 
 
 **5.HIGHEST RATED SERIES**
 
-I joined ALL_TITLES and TITLE_EPISODES to create a new dataset known as 'SERIES`
+I joined ALL_TITLES and TITLE_EPISODES to create a new dataset known as 'SERIES\`
 
 ```{r echo=TRUE}
 #| message: false 
@@ -419,7 +429,9 @@ SERIES <- right_join(
     select(-tconst),                # Drop the tconst column
   by = c("tconst" = "parentTconst") )
 ```
+
 I used word cloud to print the titles based on the number of Votes
+
 ```{r echo=TRUE}
 #| message: false 
 #| warning: false
@@ -496,7 +508,7 @@ identify_title<-function(df,word){
 
 ```
 
-`highest_top_50` function was developed to identify and retrieve the top 50 movies based on the number of votes and ratings. This function takes a dataframe as input, arranges the data in descending order by `numVotes` and `new_rating`, and returns the top 50 entries while excluding the columns `averageRating`, `tconst`, and `titleType` from the output. 
+`highest_top_50` function was developed to identify and retrieve the top 50 movies based on the number of votes and ratings. This function takes a dataframe as input, arranges the data in descending order by `numVotes` and `new_rating`, and returns the top 50 entries while excluding the columns `averageRating`, `tconst`, and `titleType` from the output.
 
 ```{r echo=TRUE}
 #| message: false 
@@ -510,7 +522,9 @@ highest_top_50<-function(df)
     select(-averageRating,-tconst,-titleType)
 }
 ```
+
 Next, the dataset `movies_rated` was generated by using the `identify_title` function to filter movie titles from the `ALL_TITLES` dataset, ensuring only distinct rows were included, and removing the `genre_cleaned` column. The `highest_top_50` function was then applied to this dataset, and the result was passed to the `table_creation` function, which produced an interactive table using the `DT` package to display the top 50 movies based on votes and ratings.
+
 ```{r}
 #| message: false 
 #| warning: false
@@ -561,6 +575,7 @@ find_projects(name)|>select(primaryTitle,new_rating,numVotes)|>distinct()|>
 ```
 
 Here is the Visual representation of Tom Hanks successes based on genres. Hanks has won Oscars for Forrest Gump and Philadelphia and has been nominated for several other roles. By evaluating the IMDb rating of his Oscar-nominated films, you can confirm that his roles consistently perform well by your chosen metrics.
+
 ```{r}
 #| label: "successful_projects"
 #| message: false 
@@ -598,7 +613,6 @@ find_projects(name) |>
 
 
 ```
-
 
 **5.Determining the Cutoff: What Makes a Project 'Solid'?**
 
@@ -732,7 +746,9 @@ The resulting cleaned dataset, `success_decade`, now contains distinct entries o
 library(tidyverse)
 sample_n(success_decade,10)|>DT::datatable(caption = "sample of Success Decade Dataset")
 ```
+
 To visual total number of movies based on genre
+
 ```{r}
 #| label: 'No of Movies Based on Genres'
 #| message: false 
@@ -760,7 +776,9 @@ success_decade |>
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1,size = 6))
 ```
+
 Here is a word cloud of the genres based on the counts
+
 ```{r}
 #|warning: false
 
