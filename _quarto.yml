@@ -18,7 +18,8 @@ website:
     
 format:
   html:
-    theme: zephyr
-    css: styles.css
+    theme: sandstone
+    margin-left: 0em
     toc: true
-    page-layout: full
+    code-copy: true
+    toc_depth: 5
