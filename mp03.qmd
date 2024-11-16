@@ -665,7 +665,6 @@ district_wide_winner_take_all <- district_winner |>
   summarize(electoral_votes = sum(total_electoral_votes)+1) |>
   drop_na() # get rid of the non-presidential election years
 
-#Add Party Information
 
 district_wide_winner_take_all<-district_wide_winner_take_all|>left_join(candidate_party,by=c("year","candidate"))|>filter(party_simplified %in% c("DEMOCRAT","REPUBLICAN"))|>unique()
 datatable(setNames(district_wide_winner_take_all, c("Year", "Winning Candidate", "Electoral Votes","PARTY")),
