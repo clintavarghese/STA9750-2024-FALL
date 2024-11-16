@@ -1,1 +1,1 @@
-Sitemap: https://clintavarghese.github.io/STA9750-2024-FALL/sitemap.xml
+Sitemap: https://clintavarghese.github.io/STA9750-2024-FALL/mp01/sitemap.xml

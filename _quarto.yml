@@ -3,15 +3,18 @@ project:
   output-dir: docs
 
 website:
-  title: "STA 9750 2024 Submission Material"
+  title: "CLINTA PUTHUSSERY VARGHESE"
   description:
     Course Projects for STA 9750 at Baruch College
-  site-url: "https://clintavarghese.github.io/STA9750-2024-FALL/"
+   site-url:https://clintavarghese.github.io/STA9750-2024-FALL/index.html
+   repo-url:https://github.com/clintavarghese/STA9750-2024-FALL
+   repo-actions:[edit, source, issue]
   navbar:
     background: primary
-    search: false
+    search: true
     
 format:
   html:
-    theme: sandstone 
+    theme:
+        - darkly
     toc: false
