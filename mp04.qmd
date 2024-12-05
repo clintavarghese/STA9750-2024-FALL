@@ -4,7 +4,7 @@ author:
   - name: Clinta Puthussery Varghese
   
 format:
-  pdf: 
+  html: 
     code-fold: true
     toc: true
 ---
@@ -766,6 +766,135 @@ cat("Total fund at retirement: $", round(result$total_balance, 2), "\n")
 cat("Annual payout (4% withdrawal): $", round(result$annual_payout, 2), "\n")
 cat("Monthly payout: $", round(result$monthly_payout, 2), "\n")
 ```
+![](docs/rshinyapp.png){fig-align="center" width="680"}
+I am working on it to get it published.
+```{r}
+# Load the shiny library
+library(shiny)
 
+# Define the UI
+ui <- fluidPage(
+  titlePanel("CUNY TRS Retirement Benefit Calculator"),
+  
+  sidebarLayout(
+    sidebarPanel(
+      numericInput("salary", "Current Annual Salary ($):", value = 50000, min = 0),
+      numericInput("age", "Current Age:", value = 30, min = 18, max = 70),
+      numericInput("retirement_age", "Retirement Age:", value = 65, min = 50, max = 80),
+      numericInput("annual_increase", "Annual Salary Increase (%):", value = 3, min = 0, max = 20),
+      numericInput("average_life_expectancy", "Average Life Expectancy (years):", value = 85, min = 70, max = 100),
+      numericInput("cpi", "CPI (%) for Adjustment:", value = 3, min = 0, max = 10),
+      actionButton("calculate", "Calculate"),
+      actionButton("reset","Reset")
+    ),
+    
+    mainPanel(
+      h3("Results"),
+      verbatimTextOutput("results"),
+      plotlyOutput("salary_plot") 
+    )
+  )
+)
+
+# Define the server logic
+server <- function(input, output) {
+  output$results <- renderPrint({
+    input$calculate # Trigger calculation when button is clicked
+    
+    salary <- input$salary
+    age <- input$age
+    retirement_age <- input$retirement_age
+    annual_increase <- input$annual_increase
+    average_life_expectancy <- input$average_life_expectancy
+    cpi <- input$cpi / 100 # Convert to decimal
+    
+    total_contributions <- 0
+    years_of_service <- retirement_age - age
+    last_3_salaries <- numeric(3)
+    retirement_benefit_years <- average_life_expectancy - retirement_age
+    
+    
+    # Calculate salary progression over years of service based on the annual wage growth
+    salary_progression <- data.frame(year = (age + 1):(retirement_age), salary = numeric(years_of_service))
+    salary_progression$salary[1] <- salary
+    # Define the employee contribution function
+    employee_contribution <- function(salary) {
+      emp_rate <- ifelse(salary <= 45000, 0.03, 
+                         ifelse(salary <= 55000, 0.035,
+                                ifelse(salary <= 75000, 0.045,
+                                       ifelse(salary <= 100000, 0.0575, 0.06))))
+      biweekly_contribution <- salary * emp_rate / 26
+      return(biweekly_contribution)
+    }
+    
+    # Loop to calculate total contributions and final average salary (FAS)
+    for (i in 1:years_of_service) {
+      salary <- salary + salary * annual_increase / 100
+      biweekly_contributions <- employee_contribution(salary)
+      
+      # Update the last 3 years of salary
+      if (i > years_of_service - 3) {
+        last_3_salaries[i - (years_of_service - 3)] <- salary
+      }
+      
+      total_contributions <- total_contributions + biweekly_contributions*26
+    }
+    
+    # Compute the final average salary (FAS)
+    FAS <- mean(last_3_salaries)
+    
+    # Define the annual retirement benefit function
+    annual_retirement_benefit <- function(FAS, years_of_service, retirement_benefit_years) {
+      if (years_of_service <= 20) {
+        benefit <- 0.0167 * FAS * years_of_service
+      } else if (years_of_service == 20) {
+        benefit <- 0.0175 * FAS * years_of_service
+      } else {
+        benefit <- (0.35 + 0.02 * (years_of_service - 20)) * FAS
+      }
+      
+      # Apply CPI adjustment
+      cpi_adjustment <- max(min(0.01 + 0.005 * cpi, 0.03), 0.01)
+      adjusted_benefit <- benefit * (1 + cpi_adjustment)^retirement_benefit_years
+      
+      return(adjusted_benefit)
+    }
+    
+    # Calculate annual retirement benefit
+    adjusted_benefit <- annual_retirement_benefit(FAS, years_of_service, retirement_benefit_years)
+    
+    # Print the results
+    cat("Years Of Services:",years_of_service,"/n")
+    cat("Final Average Salary (FAS): $", round(FAS, 2), "\n")
+    cat("Total Employee Contributions: $", round(total_contributions, 2), "\n")
+    cat("Annual Inflation-Adjusted Retirement Benefit for",retirement_benefit_years, "years: $", round(adjusted_benefit, 2), "\n")
+  })
+
+output$salary_plot <- renderPlotly({
+  salary <- input$salary
+  annual_increase <- input$annual_increase
+  years_of_service <- input$retirement_age - input$age
+  
+  # Generate yearly salary data
+  salary_data <- data.frame(
+    Year = seq(1, years_of_service),
+    Salary = cumprod(rep(1 + annual_increase / 100, years_of_service)) * salary
+  )
+  
+  # Plot the salary progression
+ salary_increase_graph<- ggplot(salary_data, aes(x = Year, y = Salary)) +
+    geom_line(color = "blue", size = 1) +
+    labs(title = "Salary Progression Over Service Years",
+         x = "Years of Service",
+         y = "Salary ($)") +
+    theme_minimal()
+ ggplotly(salary_increase_graph)
+})
+}
+
+# Run the application
+shinyApp(ui = ui, server = server)
+
+```
 
 
