@@ -8,12 +8,12 @@ format:
     code-fold: true
     toc: true
 ---
-##INTRODUCTION\
+## INTRODUCTION\
 
 In this project, I am tackling a vital personal financial decision using R: selecting a retirement plan as a newly hired faculty member at CUNY. Faculty members have 30 days to choose between two options, and this decision is essentially permanent. Choosing the right plan is no small task—it requires careful analysis of financial trends, demographic assumptions, and personal circumstances. Through this project, I plan to dive into historical financial data and use a bootstrap inference strategy to estimate the probability that one plan outperforms the other.
 CUNY offers two retirement plans, the traditional defined-benefit Teachers Retirement System (TRS) plan and the newer defined-contribution Optional Retirement Plan (ORP). For this project, I ignore the effect of taxes as both plans offer pre-tax retirement savings, so whichever plan has the greater (nominal, pre-tax) income will also yield the greater (post-tax) take-home amount.
 
-###Teachers Retirement System\
+### Teachers Retirement System\
 
 The TRS plan is a traditional pension plan: after retirement, the employer (CUNY) continues to pay employees a fraction of their salary until death. This type of plan is called a “defined-benefit” because the retirement pay (the benefit) is fixed a priori and the employer takes the market risk. If the market underperforms expectations, CUNY has to “pony up” and make up the gap; if the market overperforms expectations, CUNY pockets the excess balance.
 
@@ -38,7 +38,7 @@ The benefit is increased annually by 50% of the CPI, rounded up to the nearest t
 
 The inflation adjustement is effective each September and the CPI used is the aggregate monthly CPI of the previous 12 months; so the September 2024 adjustment depends on the CPI from September 2023 to August 2024.
 
-###Optional Retirement Plan
+### Optional Retirement Plan\
 
 The ORP plan is more similar to a 401(k) plan offered by a private employer. The employee and the employer both make contributions to a retirement account which is then invested in the employee’s choice of mutual funds. Those investments grow “tax-free” until the employee begins to withdraw them upon retirement. If the employee does not use up the funds, they are passed down to that employee’s spouse, children, or other heirs; if the employee uses the funds too quickly and zeros out the account balance, no additional retirement funds are available. Though the employee hopefully still has Social Security retirement benefits and other savings to cover living expenses. This type of plan is called a defined-contribution plan as only the contributions to the retirement account are fixed by contract: the final balance depends on market factors outside of the employee’s control.
 
@@ -80,13 +80,17 @@ Employer: 8% of salary = 0.08 * $52,267 = $4,181.36
 Employee: 3.5% of salary = 0.035 * $52,267 = $1,829.35
 Total: 11.5% of $52,267 = 4181.36 + 1829.35 = $6010.71
 because their salary puts them in the 3.5% Contribution Range. On a monthly basis, this works out to a contribution of about $500.89 per month.
-##DATA SOURCES
+
+## DATA SOURCES\
+
 For this project, the data are collected from two economic and financial resources:
 - [AlphaVantage](https://www.alphavantage.co/): a commercial stock market 
   data provider
 - [FRED](https://fred.stlouisfed.org/): the Federal Reserve Economic Data 
-  repository maintained by the Federal Reserve Bank of St. Louis
-###LOAD NECESSARY PACKAGES  
+  repository maintained by the Federal Reserve Bank of St. Louis.\
+  
+### LOAD NECESSARY PACKAGES \
+
 ```{r}
 #| warning: false
 #| message: false
@@ -103,7 +107,9 @@ library(httr2)
 library(jsonlite)
 library(tidyverse)
 ```
-###LOAD ENVIRONMENT VARIABLES
+
+### LOAD ENVIRONMENT VARIABLES\
+
 I created an account in both AlphaVantage and FRED to get the apikey, and those api keys are stored  as `AV_KEY` and `FRED_KEY` in the `.Renviron` file. 
 ```{r}
 #TASK 1 and TASK 2
@@ -114,7 +120,9 @@ readRenviron("~/STA9750-2024-FALL/MP-DATA/.Renviron")
 # Load environment variables
 #source("~/STA9750-2024-FALL/functions_MP04.R")
 ```
-###Functions To Fetch From AlphaVantage and FRED
+
+### Functions To Fetch From AlphaVantage and FRED\
+
 ```{r}
 #| warning: false
 #| message: false
@@ -234,7 +242,8 @@ fetch_fred <- function(series_id) {
 
 ```
 
-##DATA ACQUISITION
+## DATA ACQUISITION\
+
 As the next step, I have collected historical data covering
 - Rate of Inflation
 - Rate of Wage Growth
@@ -242,7 +251,9 @@ As the next step, I have collected historical data covering
 - International Equity Market Returns
 - Bond Returns
 - Short Term Debt Returns
-### FRED Data
+
+### FRED Data\
+
 ```{r}
 # Load necessary library
 library(lubridate)  # For working with dates (e.g., extracting year from a date object)
@@ -310,7 +321,8 @@ WAGE_GROWTH_DATA<-fetch_fred("CES0500000003")|>convert_fred_datatype()|>rename(w
 WAGE_GROWTH_GOVT_EMPLOYEES<-fetch_fred("CIU3026100000000I")|>convert_fred_datatype()|>rename(wage_growth_rate=value,month=date)
 ```
 
-###Functions to calculate return:
+### Functions to calculate return:\
+
 ```{r}
 #| warning: false
 #| message: false
@@ -324,7 +336,9 @@ calculate_return_symbol <- function(alpha_vantage_symbol_data) {
 }
  
 ```
-###Functions to calculate long run averages
+
+### Functions to calculate long run averages\
+
 ```{r}
 #| warning: false
 #| message: false
@@ -340,7 +354,9 @@ long_run_monthly_avg <- function(returns_df){
   return(rect_df)
 }
 ```
-###ALPHAVANTAGE Data
+
+### ALPHAVANTAGE Data\
+
 ```{r}
 # Fetching US Equity Market Data Using ETFs
 
@@ -542,9 +558,11 @@ all.data <- list(
 
 ```
 
-##INITIAL ANALYSIS AND VISUALIZATION OF INPUT DATA
+## INITIAL ANALYSIS AND VISUALIZATION OF INPUT DATA\
 
-###Comparing the Inflation in NYC and US Cities Average (1990-2024)
+### Comparing the Inflation in NYC and US Cities Average (1990-2024)\
+
+
 ```{r}
 #| warning: false
 #| message: false
@@ -563,7 +581,9 @@ ggplot (data = INFLATION_ALL|>filter(year(date)>=1990), aes(x=date, y=value,colo
         plot.caption = element_text(size=6, face="italic"),
         plot.title.position = "plot")
 ```
-###Montly Adjusted Close Prices of SPY, QQQ, and DIA (US MARKET EQUITY)
+
+### Montly Adjusted Close Prices of SPY, QQQ, and DIA (US MARKET EQUITY)\
+
 ```{r}
 #| warning: false
 #| message: false
@@ -579,7 +599,9 @@ gg<-ggplot(US_MARKET_EQUITY, aes(x = month, y = adjusted_close, color = symbol, 
   theme_bw()
 ggplotly(gg)
 ```
-###Montly Adjusted Close Prices of VTMGX,VEIEX(INTERNATIONAL_EQUITY)
+
+### Montly Adjusted Close Prices of VTMGX,VEIEX(INTERNATIONAL_EQUITY)\
+
 ```{r}
 #| warning: false
 #| message: false
@@ -595,7 +617,9 @@ gg2<-ggplot(INTERNATIONAL_MARKET_EQUITY, aes(x = month, y = adjusted_close, colo
   theme_bw()
 ggplotly(gg2)
 ```
-###Montly Adjusted Close Prices of AGG and VICSX(BOND MARKET EQUITY)
+
+### Montly Adjusted Close Prices of AGG and VICSX(BOND MARKET EQUITY)\
+
 ```{r}
 #| warning: false
 #| message: false
@@ -611,7 +635,9 @@ gg3<-ggplot(BOND_MARKET_EQUITY, aes(x = month, y = adjusted_close, color = symbo
   theme_bw()
 ggplotly(gg3)
 ```
-###Log10 Monthly Adjusted Close Prices for Bond, International, and US Market Equities
+
+### Log10 Monthly Adjusted Close Prices for Bond, International, and US Market Equities\
+
 ```{r}
 #| warning: false
 #| message: false
@@ -632,8 +658,11 @@ ggplotly(gg4)
 -US Market Equity show greater volatility and fluctuation, characteristic of stock market performance, where prices tend to experience sharper rises and declines. 
 -International Market Equity provides insights into global economic trends, potentially reflecting periods of growth or decline in different countries or regions. 
 -The log10 transformation allows for a more uniform view of percentage changes, making the comparison of relative growth rates more apparent than comparing raw values.
-###Equal-Weighted U.S. Market Equity Monthly and Annual Returns (SPY, QQQ, DIA)
+
+### Equal-Weighted U.S. Market Equity Monthly and Annual Returns (SPY, QQQ, DIA)\
+
 ```{r}
+
 #| warning: false
 #| message: false
 calculate.return=function(alpha_vantage_symbol_data){
@@ -695,7 +724,9 @@ ggplotly(ggg, dynamicTicks = TRUE) |>
     yaxis = list(value = ".2f") ) # Format ticks as percentage
          
 ```
-###Correlation between key economic indicators
+
+### Correlation between key economic indicators\
+
 ```{r}
 #| warning: false
 #| message: false
@@ -733,7 +764,9 @@ ggplot(correlation_heatmap, aes(x = variable1, y = variable2, fill = correlation
 -Bonds_equity_market_return and VSGDX_returns(%) have a strong positive correlation (0.8354), reflecting alignment between bond and specific equity market returns. 
 -Wage Growth & Inflation: The high correlation (0.9878) between wage growth and inflation suggests that wage adjustments might follow inflation trends.
 -Equities & Bonds: The mixed correlations (positive and negative) across equity and bond returns reflect diverse market dynamics.
-##HISTORICAL COMPARISON OF TRS and ORP
+
+## HISTORICAL COMPARISON OF TRS and ORP\
+
 I am trying to do a comparison of TRS and ORP with collected historical data. 
 The assumption is the CUNY employee joined the first month of the historical data and retired from CUNY at the end of the final month of data.
 ```{r}
@@ -960,7 +993,9 @@ calculate_orp_with_age <- function(starting_salary, starting_age, wage_growth_da
   return(result)
 }
 ```
-###Testing the functions for the hypothetical employee. 
+
+### Testing the functions for the hypothetical employee\
+
 ```{r}
 #| warning: false
 #| message: false
@@ -1023,7 +1058,8 @@ cat("Annual payout (4% withdrawal): $", round(result$annual_payout, 2), "\n")
 cat("Monthly payout: $", round(result$monthly_payout, 2), "\n")
 ```
 
-##MONTE CARLO SIMULATION
+## MONTE CARLO SIMULATION\
+
 Inspired from [Youtube Video](https://www.youtube.com/watch?v=wrWmko61WMg)
 ```{r}
 
@@ -1060,6 +1096,8 @@ visualize_simulations=function(path)
 ![](docs/rshinyapp.png){fig-align="center" width="680"}
 I am working on it to get it published.
 ```{r}
+#|warning: false
+#|message: false
 # Load the shiny library
 library(shiny)
 
