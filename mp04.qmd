@@ -8,7 +8,85 @@ format:
     code-fold: true
     toc: true
 ---
-Data Collection
+##INTRODUCTION\
+
+In this project, I am tackling a vital personal financial decision using R: selecting a retirement plan as a newly hired faculty member at CUNY. Faculty members have 30 days to choose between two options, and this decision is essentially permanent. Choosing the right plan is no small task—it requires careful analysis of financial trends, demographic assumptions, and personal circumstances. Through this project, I plan to dive into historical financial data and use a bootstrap inference strategy to estimate the probability that one plan outperforms the other.
+CUNY offers two retirement plans, the traditional defined-benefit Teachers Retirement System (TRS) plan and the newer defined-contribution Optional Retirement Plan (ORP). For this project, I ignore the effect of taxes as both plans offer pre-tax retirement savings, so whichever plan has the greater (nominal, pre-tax) income will also yield the greater (post-tax) take-home amount.
+
+###Teachers Retirement System\
+
+The TRS plan is a traditional pension plan: after retirement, the employer (CUNY) continues to pay employees a fraction of their salary until death. This type of plan is called a “defined-benefit” because the retirement pay (the benefit) is fixed a priori and the employer takes the market risk. If the market underperforms expectations, CUNY has to “pony up” and make up the gap; if the market overperforms expectations, CUNY pockets the excess balance.
+
+At CUNY, the TRS is administered as follows:
+
+Employees pay a fixed percentage of their paycheck into the pension fund. For CUNY employees joining after March 31, 2012–which you may assume for this project–the so-called “Tier VI” contribution rates are based on the employee’s annual salary and increase as follows:
+
+$45,000 or less: 3%
+$45,001 to $55,000: 3.5%
+$55,001 to $75,000: 4.5%
+$75,001 to $100,000: 5.75%
+$100,001 or more: 6%
+
+The retirement benefit is calculated based on the Final Average Salary of the employee: following 2024 law changes, the FAS is computed based on the final three years salary. (Previously, FAS was computed based on 5 years: since salaries tend to increase monotonically over time, this is a major win for TRS participants.)
+
+If **N** is the number of years served, the annual retirement benefit is:
+**1.67%*FAS*N if N<=20**
+**1.75%*FAS*N if N=20**
+**(35%+2%*(N-20))*FAS*N if N>=20**
+
+The benefit is increased annually by 50% of the CPI, rounded up to the nearest tenth of a percent: e.g., a CPI of 2.9% gives an inflation adjustment of 1.5%. The benefit is capped below at 1% and above at 3%, so a CPI of 10% leads to a 3% inflation adjustment while a CPI of 0% leads to a 1% inflation adjustment.
+
+The inflation adjustement is effective each September and the CPI used is the aggregate monthly CPI of the previous 12 months; so the September 2024 adjustment depends on the CPI from September 2023 to August 2024.
+
+###Optional Retirement Plan
+
+The ORP plan is more similar to a 401(k) plan offered by a private employer. The employee and the employer both make contributions to a retirement account which is then invested in the employee’s choice of mutual funds. Those investments grow “tax-free” until the employee begins to withdraw them upon retirement. If the employee does not use up the funds, they are passed down to that employee’s spouse, children, or other heirs; if the employee uses the funds too quickly and zeros out the account balance, no additional retirement funds are available. Though the employee hopefully still has Social Security retirement benefits and other savings to cover living expenses. This type of plan is called a defined-contribution plan as only the contributions to the retirement account are fixed by contract: the final balance depends on market factors outside of the employee’s control.
+
+At retirement, the employee has access to those funds and can choose to withdraw them at any rate desired. A general rule of thumb is withdrawing 4% of the value per year, e.g., this Schwab discussion; you can assume a constant withdrawal rate in your analysis. Note that unwithdrawn funds continue to experience market returns.
+
+The funds available in a ORP account depend strongly on the investments chosen. For this analysis, you can assume that the ORP participants invest in a Fidelity Freedom Fund with the following asset allocation:5
+
+Age 25 to Age 49:
+54% US Equities
+36% International Equities
+10% Bonds
+Age 50 to Age 59:
+47% US Equities
+32% International Equities
+21% Bonds
+Age 60 to Age 74:
+34% US Equities
+23% International Equities
+43% Bonds
+Age 75 or older:
+19% US Equities
+13% International Equities
+62% Bonds
+6% Short-Term Debt
+Under the ORP, both the employee and the employer make monthly contributions to the employee’s ORP account. These contributions are calculated as a percentage of the employee’s annual salary. Specifically, the employee contributes at the same rate as the TRS:
+
+$45,000 or less: 3%
+$45,001 to $55,000: 3.5%
+$55,001 to $75,000: 4.5%
+$75,001 to $100,000: 5.75%
+$100,001 or more: 6%
+The employer contribution is fixed at:
+
+8% for the first seven years of employment at CUNY.
+10% for all years thereafter.
+For example, if an employee made $52,267 in their first year at CUNY6, the total annual contributions to their ORP account would be:
+
+Employer: 8% of salary = 0.08 * $52,267 = $4,181.36
+Employee: 3.5% of salary = 0.035 * $52,267 = $1,829.35
+Total: 11.5% of $52,267 = 4181.36 + 1829.35 = $6010.71
+because their salary puts them in the 3.5% Contribution Range. On a monthly basis, this works out to a contribution of about $500.89 per month.
+##DATA SOURCES
+For this project, the data are collected from two economic and financial resources:
+- [AlphaVantage](https://www.alphavantage.co/): a commercial stock market 
+  data provider
+- [FRED](https://fred.stlouisfed.org/): the Federal Reserve Economic Data 
+  repository maintained by the Federal Reserve Bank of St. Louis
+###LOAD NECESSARY PACKAGES  
 ```{r}
 #| warning: false
 #| message: false
@@ -25,8 +103,10 @@ library(httr2)
 library(jsonlite)
 library(tidyverse)
 ```
-
+###LOAD ENVIRONMENT VARIABLES
+I created an account in both AlphaVantage and FRED to get the apikey, and those api keys are stored  as `AV_KEY` and `FRED_KEY` in the `.Renviron` file. 
 ```{r}
+#TASK 1 and TASK 2
 #| warning: false
 #| message: false
 # Load environment variables
@@ -34,7 +114,7 @@ readRenviron("~/STA9750-2024-FALL/MP-DATA/.Renviron")
 # Load environment variables
 #source("~/STA9750-2024-FALL/functions_MP04.R")
 ```
-Functions to fetch from AlphaVantage and FRED
+###Functions To Fetch From AlphaVantage and FRED
 ```{r}
 #| warning: false
 #| message: false
@@ -90,7 +170,7 @@ convert_to_a_table<-function(symbol_data)
 }
 
 fetch_alpha_vantage <- function(symbol, function_name = "TIME_SERIES_MONTHLY_ADJUSTED") {
-  av_key <- Sys.getenv("AV_KEY")
+  av_key <- Sys.getenv("AV_KEY") ##apikey
   url <- paste0(
     "https://www.alphavantage.co/query?",
     "function=", function_name,
@@ -118,7 +198,7 @@ fetch_alpha_vantage <- function(symbol, function_name = "TIME_SERIES_MONTHLY_ADJ
 
 # Function to fetch data from FRED
 fetch_fred <- function(series_id) {
-  fred_key <- Sys.getenv("FRED_KEY")
+  fred_key <- Sys.getenv("FRED_KEY") ##apikey for fred
   real_time_start="1980-01-01"
   real_time_end=Sys.Date()
   frequency="m"
@@ -154,51 +234,83 @@ fetch_fred <- function(series_id) {
 
 ```
 
-Data Collection
-Rate of Inflation:yes
-Rate of Wage Growth:
-US Equity Market Returns:alpha
-International Equity Market Returns:
-Bond Returns:
-Short Term Debt Returns:
-1.Inflation Data
+##DATA ACQUISITION
+As the next step, I have collected historical data covering
+- Rate of Inflation
+- Rate of Wage Growth
+- US Equity Market Returns
+- International Equity Market Returns
+- Bond Returns
+- Short Term Debt Returns
+### FRED Data
 ```{r}
-library(lubridate)
+# Load necessary library
+library(lubridate)  # For working with dates (e.g., extracting year from a date object)
 
-#| warning: false
-#| message: false
+# Suppress warnings and messages for better readability of output
+#| warning: false  # Disable warnings
+#| message: false  # Disable messages
 
-# Inflation, consumer prices for the United States 
-INFLATION_ANNUAL=fetch_fred(series_id = "FPCPITOTLZGUSA")|>convert_fred_datatype()|>mutate(Annual_CPI_Percentage=value)
+# Fetching and processing inflation data
 
-#Consumer Price Index for All Urban Consumers: All Items in U.S. City Average (CPIAUCSL)
-INFLATION_US_URBAN_AVERAGE=fetch_fred(series_id = "CPIAUCSL")|>convert_fred_datatype()|>rename(US_City_Monthly_Inflation_Average=value,month=date)
+# 1. **Annual Inflation (Percentage)** 
+# Fetches inflation data (consumer prices for the United States) from the FRED API
+# Converts data types for compatibility and adds a new column for annual CPI percentages
+INFLATION_ANNUAL <- fetch_fred(series_id = "FPCPITOTLZGUSA") |> 
+  convert_fred_datatype() |> 
+  mutate(Annual_CPI_Percentage = value)
 
-annual_inflation_average_percentage<-INFLATION_US_URBAN_AVERAGE |>
-  mutate(year = year(month)) |>
-  group_by(year) |>
+# 2. **Monthly Inflation Average (Urban Areas)**
+# Fetches the Consumer Price Index for All Urban Consumers from the FRED API
+# Renames the `value` column to `US_City_Monthly_Inflation_Average` and `date` to `month` for clarity
+INFLATION_US_URBAN_AVERAGE <- fetch_fred(series_id = "CPIAUCSL") |> 
+  convert_fred_datatype() |> 
+  rename(US_City_Monthly_Inflation_Average = value, month = date)
+
+# 3. **Annual Inflation Average and Percentage Change**
+# Calculates the annual average of monthly inflation data
+# Groups data by year, computes the mean for each year, and calculates percentage changes compared to the previous year
+annual_inflation_average_percentage <- INFLATION_US_URBAN_AVERAGE |> 
+  mutate(year = year(month)) |>  # Extracts year from the month column
+  group_by(year) |>  # Groups data by year for annual summary
   summarize(
-    annual_inflation_average = mean(US_City_Monthly_Inflation_Average), # Annual average
-    .groups = "drop"                       # Ungroup after summarizing
-  ) |>
+    annual_inflation_average = mean(US_City_Monthly_Inflation_Average),  # Computes the mean inflation for each year
+    .groups = "drop"  # Ungroup data after summarizing
+  ) |> 
   mutate(
-    perc_change_annual = (annual_inflation_average - lag(annual_inflation_average)) / lag(annual_inflation_average)*100
+    perc_change_annual = (annual_inflation_average - lag(annual_inflation_average)) / lag(annual_inflation_average) * 100  # Computes year-over-year percentage change
   )
-                                                                                                                                                                      
-# Consumer Price Index for All Urban Consumers: All Items in New York-Newark-Jersey City, NY-NJ-PA (CBSA)
-INFLATION_NYC=fetch_fred(series_id ="CUURA101SA0")|>convert_fred_datatype()|>mutate(type="NYC Monthly Average ")
+
+# 4. **Monthly Inflation Average (NYC Metro Area)**
+# Fetches inflation data for the NYC metropolitan area from the FRED API
+# Converts data types and adds a descriptive column indicating the type of data
+INFLATION_NYC <- fetch_fred(series_id = "CUURA101SA0") |> 
+  convert_fred_datatype() |> 
+  mutate(type = "NYC Monthly Average")
+
+# Note:
+# - `fetch_fred(series_id = "...")`: Retrieves data from the FRED API using the specified series ID.
+# - `convert_fred_datatype()`: Converts data types to ensure compatibility with further operations.
+# - `mutate()`: Adds or modifies columns in a data frame.
+# - `group_by()`: Groups data for aggregation (e.g., summarizing by year).
+# - `summarize()`: Aggregates data (e.g., computes annual averages).
+# - `lag()`: Accesses previous row values for calculating percentage changes.
 
 
 ```
-2.Wage Growth
+
 ```{r}
 #| warning: false
 #| message: false
+# 5. *Average Hourly Earnings of All Employees, Total Private CES0500000003**
+# Fetches Average Hourly Earnings of All Employees, Total Private from the FRED API
+# Converts data types and adds a descriptive column indicating the type of data
 WAGE_GROWTH_DATA<-fetch_fred("CES0500000003")|>convert_fred_datatype()|>rename(wage_growth_rate=value,month=date)
+#6.*Employment Cost Index: Wages and salaries for State and local government workers in Education services (CIU3026100000000I)*
 WAGE_GROWTH_GOVT_EMPLOYEES<-fetch_fred("CIU3026100000000I")|>convert_fred_datatype()|>rename(wage_growth_rate=value,month=date)
 ```
 
-##function to find the returns:
+###Functions to calculate return:
 ```{r}
 #| warning: false
 #| message: false
@@ -212,7 +324,7 @@ calculate_return_symbol <- function(alpha_vantage_symbol_data) {
 }
  
 ```
-# function to calculate long run average:
+###Functions to calculate long run averages
 ```{r}
 #| warning: false
 #| message: false
@@ -228,83 +340,211 @@ long_run_monthly_avg <- function(returns_df){
   return(rect_df)
 }
 ```
-
-3.US Equity Markets Returns:
-
+###ALPHAVANTAGE Data
 ```{r}
-#| warning: false
-#| message: false
- #S&P 500 ETF as a proxy for US equity market
-SPY_ETF <- fetch_alpha_vantage(symbol = "SPY")
-SPY_ETF$symbol="SPY"
-QQQ_ETF <- fetch_alpha_vantage(symbol = "QQQ")
-QQQ_ETF$symbol="QQQ"
-DIA_ETF <- fetch_alpha_vantage(symbol = "DIA")
-DIA_ETF$symbol="DIA"
+# Fetching US Equity Market Data Using ETFs
 
-usequity1.perc.returns=calculate_return_symbol(SPY_ETF)
-usequity2.perc.returns=calculate_return_symbol(QQQ_ETF)
-usequity3.perc.returns=calculate_return_symbol(DIA_ETF)
-usequity.all.perc.returns=list(usequity1.perc.returns|>select(month,`SPY_returns(%)`),usequity2.perc.returns|>select(month,`QQQ_returns(%)`),usequity3.perc.returns|>select(month,`DIA_returns(%)`))|>
-  reduce(full_join, by = "month") |>
-  arrange(month) |>
-  drop_na() |>mutate(
+# 1. **S&P 500 ETF (SPY)**
+# Fetches data for SPY ETF from Alpha Vantage, representing the S&P 500 index as a proxy for the US equity market.
+SPY_ETF <- fetch_alpha_vantage(symbol = "SPY")  # Retrieves SPY ETF data
+SPY_ETF$symbol <- "SPY"  # Adds a new column identifying the symbol for clarity
+
+# 2. **Nasdaq-100 ETF (QQQ)**
+# Fetches data for QQQ ETF from Alpha Vantage, representing the Nasdaq-100 index as another proxy for US equity performance.
+QQQ_ETF <- fetch_alpha_vantage(symbol = "QQQ")  # Retrieves QQQ ETF data
+QQQ_ETF$symbol <- "QQQ"  # Adds a new column identifying the symbol for clarity
+
+# 3. **Dow Jones Industrial Average ETF (DIA)**
+# Fetches data for DIA ETF from Alpha Vantage, representing the Dow Jones Industrial Average as a proxy for US equity.
+DIA_ETF <- fetch_alpha_vantage(symbol = "DIA")  # Retrieves DIA ETF data
+DIA_ETF$symbol <- "DIA"  # Adds a new column identifying the symbol for clarity
+
+# Calculating Percentage Returns for Each ETF
+
+# 4. **Calculate Returns for SPY**
+# Computes percentage returns for the SPY ETF.
+usequity1.perc.returns <- calculate_return_symbol(SPY_ETF)
+
+# 5. **Calculate Returns for QQQ**
+# Computes percentage returns for the QQQ ETF.
+usequity2.perc.returns <- calculate_return_symbol(QQQ_ETF)
+
+# 6. **Calculate Returns for DIA**
+# Computes percentage returns for the DIA ETF.
+usequity3.perc.returns <- calculate_return_symbol(DIA_ETF)
+
+# Combining and Aggregating US Equity Market Returns
+
+# 7. **Combine Returns from All ETFs**
+# Creates a list of percentage returns from SPY, QQQ, and DIA.
+# Selects only the `month` and the respective return columns for clarity.
+usequity.all.perc.returns <- list(
+  usequity1.perc.returns |> select(month, `SPY_returns(%)`),
+  usequity2.perc.returns |> select(month, `QQQ_returns(%)`),
+  usequity3.perc.returns |> select(month, `DIA_returns(%)`)
+) |>
+  reduce(full_join, by = "month") |>  # Merges all three return datasets by `month`
+  arrange(month) |>                   # Ensures data is sorted by `month`
+  drop_na() |>                        # Removes rows with missing data
+  mutate(
+    # Calculates the average return across SPY, QQQ, and DIA to estimate the US equity market return
     US_equity_market_return = rowMeans(across(c(`SPY_returns(%)`, `QQQ_returns(%)`, `DIA_returns(%)`)), na.rm = TRUE)
   )
 
+# Explanation of Functions and Symbols:
+# - `fetch_alpha_vantage(symbol)`: Fetches ETF data from Alpha Vantage using the specified `symbol`.
+# - `$symbol`: Adds a new column to label the ETF for later identification.
+# - `calculate_return_symbol()`: Computes percentage returns for the given ETF data.
+# - `list()`: Combines selected data frames into a list.
+# - `select()`: Extracts specific columns (e.g., `month` and returns) for clarity.
+# - `reduce(full_join, by = "month")`: Merges multiple data frames by the `month` column.
+# - `arrange(month)`: Ensures the data is chronologically ordered.
+# - `drop_na()`: Removes rows with missing values to ensure accurate calculations.
+# - `mutate()`: Creates or modifies columns, e.g., computing the average market return.
+# - `rowMeans(across(...))`: Computes the average of specified columns row-wise, excluding `NA` values.
+
 
 ```
-4. International Equity Returns:
+
 ```{r}
-#| warning: false
-#| message: false
-VTMGX_INT<-fetch_alpha_vantage(symbol="VTMGX")|>mutate(symbol="VTMGX")
-VEIEX_INT<-fetch_alpha_vantage(symbol="VEIEX")|>mutate(symbol="VEIEX")
-int1.perc.returns=calculate_return_symbol(VTMGX_INT)
-int2.perc.returns=calculate_return_symbol(VEIEX_INT)
-int.all.perc.returns=list(int1.perc.returns|>select(month,`VTMGX_returns(%)`),int2.perc.returns|>select(month,`VEIEX_returns(%)`))|>
-  reduce(full_join, by = "month") |>
-  arrange(month) |>
-  drop_na() |>mutate(
+# Suppress Warnings and Messages During Execution
+#| warning: false  # Prevents warning messages from being displayed during code execution
+#| message: false  # Suppresses informational messages generated by the functions
+
+# Fetching International Equity Market Data Using ETFs
+
+# 1. **Vanguard Developed Markets Index Fund ETF (VTMGX)**
+# Fetches data for the VTMGX ETF, which tracks international developed market equities.
+VTMGX_INT <- fetch_alpha_vantage(symbol = "VTMGX") |> 
+  mutate(symbol = "VTMGX")  # Adds a column for identifying the ETF symbol
+
+# 2. **Vanguard Emerging Markets Stock Index Fund ETF (VEIEX)**
+# Fetches data for the VEIEX ETF, which tracks emerging market equities.
+VEIEX_INT <- fetch_alpha_vantage(symbol = "VEIEX") |> 
+  mutate(symbol = "VEIEX")  # Adds a column for identifying the ETF symbol
+
+# Calculating Percentage Returns for Each International ETF
+
+# 3. **Calculate Returns for VTMGX**
+# Computes percentage returns for the VTMGX ETF.
+int1.perc.returns <- calculate_return_symbol(VTMGX_INT)
+
+# 4. **Calculate Returns for VEIEX**
+# Computes percentage returns for the VEIEX ETF.
+int2.perc.returns <- calculate_return_symbol(VEIEX_INT)
+
+# Combining and Aggregating International Equity Market Returns
+
+# 5. **Combine Returns from VTMGX and VEIEX**
+# Creates a list containing the percentage returns for both international ETFs.
+# Selects only the `month` and respective return columns for clarity.
+int.all.perc.returns <- list(
+  int1.perc.returns |> select(month, `VTMGX_returns(%)`),  # Selects monthly returns for VTMGX
+  int2.perc.returns |> select(month, `VEIEX_returns(%)`)   # Selects monthly returns for VEIEX
+) |>
+  reduce(full_join, by = "month") |>  # Merges the data frames by `month` column
+  arrange(month) |>                   # Ensures the data is sorted chronologically
+  drop_na() |>                        # Removes rows with missing values
+  mutate(
+    # Calculates the average return across VTMGX and VEIEX as a proxy for the international equity market return
     Int_equity_market_return = rowMeans(across(c(`VTMGX_returns(%)`, `VEIEX_returns(%)`)), na.rm = TRUE)
   )
+
+# Explanation of Functions and Symbols:
+# - `fetch_alpha_vantage(symbol)`: Fetches ETF data from Alpha Vantage for the specified `symbol`.
+# - `mutate(symbol = ...)`: Adds a column to label the ETF for easier identification.
+# - `calculate_return_symbol()`: Computes percentage returns for the given ETF data.
+# - `list()`: Combines selected data frames into a list.
+# - `select()`: Extracts specific columns (e.g., `month` and returns) for clarity.
+# - `reduce(full_join, by = "month")`: Combines multiple data frames by the `month` column.
+# - `arrange(month)`: Sorts the data chronologically by `month`.
+# - `drop_na()`: Excludes rows with missing data for accurate calculations.
+# - `mutate()`: Creates or modifies columns, e.g., calculating the average international market return.
+# - `rowMeans(across(...))`: Computes the row-wise average of specified columns, ignoring `NA` values.
+
+
 ```
 
-5.Bonds
 ```{r}
-#| warning: false
-#| message: false
-AGG_BONDS<-fetch_alpha_vantage(symbol="AGG")|>mutate(symbol="AGG")
-VICSX_BONDS<-fetch_alpha_vantage(symbol="VICSX")|>mutate(symbol="VICSX")
-bond1.perc.returns=calculate_return_symbol(AGG_BONDS)
-bond2.perc.returns=calculate_return_symbol(VICSX_BONDS)
-bonds.all.perc.returns=list(bond1.perc.returns|>select(month,`AGG_returns(%)`),bond2.perc.returns|>select(month,`VICSX_returns(%)`))|>
-  reduce(full_join, by = "month") |>
-  arrange(month) |>
-  drop_na() |>mutate(
+# Suppress Warnings and Messages During Execution
+#| warning: false  # Disables warnings
+#| message: false  # Suppresses messages
+
+# 1. **Aggregate Bond Index ETF (AGG)**
+# Fetches data for AGG ETF, a proxy for the aggregate bond market.
+AGG_BONDS <- fetch_alpha_vantage(symbol = "AGG") |> 
+  mutate(symbol = "AGG")  # Adds a column to identify the ETF symbol.
+
+# 2. **Vanguard Intermediate-Term Corporate Bond Index Fund (VICSX)**
+# Fetches data for VICSX ETF, representing corporate bond performance.
+VICSX_BONDS <- fetch_alpha_vantage(symbol = "VICSX") |> 
+  mutate(symbol = "VICSX")  # Adds a column to identify the ETF symbol.
+
+# 3. **Calculating Percentage Returns**
+# Computes percentage returns for the AGG and VICSX ETFs.
+bond1.perc.returns <- calculate_return_symbol(AGG_BONDS)
+bond2.perc.returns <- calculate_return_symbol(VICSX_BONDS)
+
+# 4. **Combining and Aggregating Bond Returns**
+# Merges the percentage returns for AGG and VICSX, calculates average bond market returns.
+bonds.all.perc.returns <- list(
+  bond1.perc.returns |> select(month, `AGG_returns(%)`),   # Selects AGG monthly returns
+  bond2.perc.returns |> select(month, `VICSX_returns(%)`)  # Selects VICSX monthly returns
+) |>
+  reduce(full_join, by = "month") |>  # Combines the data frames on `month`
+  arrange(month) |>                   # Sorts by `month`
+  drop_na() |>                        # Removes rows with missing values
+  mutate(
+    # Calculates average bond market return
     Bonds_equity_market_return = rowMeans(across(c(`AGG_returns(%)`, `VICSX_returns(%)`)), na.rm = TRUE)
   )
+
 ```
 
-6.Short term
-```{r}
-#| warning: false
-#| message: false
-VSGDX_SHORT_TERM<-fetch_alpha_vantage(symbol="VSGDX")|>mutate(symbol="VSGDX")
-short.term.perc.returns=calculate_return_symbol(VSGDX_SHORT_TERM)
-#short.term.long.run.monthly.returns
-#long_run_monthly_avg(short.term.perc.returns)
-```
 
 ```{r}
-#| warning: false
-#| message: false
- all.data=list(WAGE_GROWTH_DATA,INFLATION_US_URBAN_AVERAGE|>select(month,US_City_Monthly_Inflation_Average),usequity.all.perc.returns|>select(month,US_equity_market_return),int.all.perc.returns|>select(month,Int_equity_market_return),bonds.all.perc.returns|>select(month,Bonds_equity_market_return),short.term.perc.returns|>select(month,`VSGDX_returns(%)`))|>
-  reduce(full_join, by = "month")|>
-  arrange(month) |>
-  drop_na() 
+# Suppress Warnings and Messages During Execution
+#| warning: false  # Disables warnings
+#| message: false  # Suppresses messages
+
+# 1. **Vanguard Short-Term Bond Index Fund (VSGDX)**
+# Fetches data for the VSGDX ETF, representing short-term bond performance.
+VSGDX_SHORT_TERM <- fetch_alpha_vantage(symbol = "VSGDX") |> 
+  mutate(symbol = "VSGDX")  # Adds a column to identify the ETF symbol.
+
+# 2. **Calculate Short-Term Returns**
+# Computes percentage returns for the VSGDX ETF.
+short.term.perc.returns <- calculate_return_symbol(VSGDX_SHORT_TERM)
+
+# Optional: Calculate long-run monthly averages if needed
+# #short.term.long.run.monthly.returns
+# #long_run_monthly_avg(short.term.perc.returns)
+
 ```
 
+```{r}
+# Suppress Warnings and Messages During Execution
+#| warning: false  # Disables warnings
+#| message: false  # Suppresses messages
+
+# Combine all relevant data sources into a single unified dataset.
+all.data <- list(
+  WAGE_GROWTH_DATA,  # Data on wage growth
+  INFLATION_US_URBAN_AVERAGE |> select(month, US_City_Monthly_Inflation_Average),  # Inflation data
+  usequity.all.perc.returns |> select(month, US_equity_market_return),  # US equity market returns
+  int.all.perc.returns |> select(month, Int_equity_market_return),  # International equity market returns
+  bonds.all.perc.returns |> select(month, Bonds_equity_market_return),  # Bond market returns
+  short.term.perc.returns |> select(month, `VSGDX_returns(%)`)  # Short-term bond returns
+) |>
+  reduce(full_join, by = "month") |>  # Merges datasets on `month`
+  arrange(month) |>                   # Ensures chronological order
+  drop_na()                           # Removes rows with missing values
+
+```
+
+##INITIAL ANALYSIS AND VISUALIZATION OF INPUT DATA
+
+###Comparing the Inflation in NYC and US Cities Average (1990-2024)
 ```{r}
 #| warning: false
 #| message: false
@@ -323,7 +563,7 @@ ggplot (data = INFLATION_ALL|>filter(year(date)>=1990), aes(x=date, y=value,colo
         plot.caption = element_text(size=6, face="italic"),
         plot.title.position = "plot")
 ```
-
+###Montly Adjusted Close Prices of SPY, QQQ, and DIA (US MARKET EQUITY)
 ```{r}
 #| warning: false
 #| message: false
@@ -339,7 +579,7 @@ gg<-ggplot(US_MARKET_EQUITY, aes(x = month, y = adjusted_close, color = symbol, 
   theme_bw()
 ggplotly(gg)
 ```
-
+###Montly Adjusted Close Prices of VTMGX,VEIEX(INTERNATIONAL_EQUITY)
 ```{r}
 #| warning: false
 #| message: false
@@ -355,7 +595,7 @@ gg2<-ggplot(INTERNATIONAL_MARKET_EQUITY, aes(x = month, y = adjusted_close, colo
   theme_bw()
 ggplotly(gg2)
 ```
-
+###Montly Adjusted Close Prices of AGG and VICSX(BOND MARKET EQUITY)
 ```{r}
 #| warning: false
 #| message: false
@@ -371,7 +611,7 @@ gg3<-ggplot(BOND_MARKET_EQUITY, aes(x = month, y = adjusted_close, color = symbo
   theme_bw()
 ggplotly(gg3)
 ```
-
+###Log10 Monthly Adjusted Close Prices for Bond, International, and US Market Equities
 ```{r}
 #| warning: false
 #| message: false
@@ -388,8 +628,11 @@ gg4<-ggplot(ALL.DATA, aes(x = month, y = log10(adjusted_close), color = type, gr
 ggplotly(gg4)
 ```
 
-The Bonds Market Equity line exhibits smoother, more stable growth compared to the others, reflecting the generally lower volatility in bond markets. US Market Equity show greater volatility and fluctuation, characteristic of stock market performance, where prices tend to experience sharper rises and declines. International Market Equity provides insights into global economic trends, potentially reflecting periods of growth or decline in different countries or regions. The log10 transformation allows for a more uniform view of percentage changes, making the comparison of relative growth rates more apparent than comparing raw values.
-
+-The Bonds Market Equity line exhibits smoother, more stable growth compared to the others, reflecting the generally lower volatility in bond markets.
+-US Market Equity show greater volatility and fluctuation, characteristic of stock market performance, where prices tend to experience sharper rises and declines. 
+-International Market Equity provides insights into global economic trends, potentially reflecting periods of growth or decline in different countries or regions. 
+-The log10 transformation allows for a more uniform view of percentage changes, making the comparison of relative growth rates more apparent than comparing raw values.
+###Equal-Weighted U.S. Market Equity Monthly and Annual Returns (SPY, QQQ, DIA)
 ```{r}
 #| warning: false
 #| message: false
@@ -452,7 +695,7 @@ ggplotly(ggg, dynamicTicks = TRUE) |>
     yaxis = list(value = ".2f") ) # Format ticks as percentage
          
 ```
-
+###Correlation between key economic indicators
 ```{r}
 #| warning: false
 #| message: false
@@ -484,7 +727,17 @@ ggplot(correlation_heatmap, aes(x = variable1, y = variable2, fill = correlation
     panel.grid = element_blank()
   )
 ```
+-wage_growth_rate and US_City_Monthly_Inflation_Average have a high correlation (0.9878), suggesting that as inflation increases, wage growth tends to increase. 
+-US_equity_market_return and wage_growth_rate (0.0184) show almost no relationship. Bonds_equity_market_return and wage_growth_rate (-0.0960) exhibit a slight inverse relationship. 
+-US_equity_market_return and Int_equity_market_return have a strong positive correlation (0.8176), indicating that international and US equity markets move similarly. 
+-Bonds_equity_market_return and VSGDX_returns(%) have a strong positive correlation (0.8354), reflecting alignment between bond and specific equity market returns. 
+-Wage Growth & Inflation: The high correlation (0.9878) between wage growth and inflation suggests that wage adjustments might follow inflation trends.
+-Equities & Bonds: The mixed correlations (positive and negative) across equity and bond returns reflect diverse market dynamics.
+##HISTORICAL COMPARISON OF TRS and ORP
+I am trying to do a comparison of TRS and ORP with collected historical data. 
+The assumption is the CUNY employee joined the first month of the historical data and retired from CUNY at the end of the final month of data.
 ```{r}
+##function to calculate TRS
 calculate_trs <- function(starting_salary, wage_growth_data, inflation_data, years_of_service, retirement_benefit_years) {
   
   salary <- starting_salary
@@ -512,7 +765,7 @@ calculate_trs <- function(starting_salary, wage_growth_data, inflation_data, yea
   }
   
   # Print Salary Progression for Debugging
-  print("::::Year Salary Progression:::::::")
+  print("\n ::::Year Salary Progression::::::: \n")
   print(salaries)
   
 
@@ -548,50 +801,6 @@ calculate_trs <- function(starting_salary, wage_growth_data, inflation_data, yea
 }
 ```
 
-```{r}
-#| warning: false
-#| message: false
-# Example usage:
-starting_salary <- 50000
-
-# Compute the annual ECI and CPI
-wage_growth_data <- WAGE_GROWTH_GOVT_EMPLOYEES |>
-  select(month, wage_growth_rate) |>
-  mutate(year = year(month)) |>
-  group_by(year) |>
-  summarize(annual_ECI = mean(wage_growth_rate, na.rm = TRUE)) |>
-  mutate(annual_ECI_perct = ((annual_ECI - lag(annual_ECI)) / lag(annual_ECI)) * 100) |>
-  filter(year >= year(min(all.data$month))) |>
-  na.omit()
-
-inflation_data <- INFLATION_US_URBAN_AVERAGE |>
-  select(month, US_City_Monthly_Inflation_Average) |>
-  mutate(year = year(month)) |>
-  group_by(year) |>
-  summarize(annual_CPI = mean(US_City_Monthly_Inflation_Average, na.rm = TRUE)) |>
-  mutate(annual_CPI_perct = ((annual_CPI - lag(annual_CPI)) / lag(annual_CPI)) * 100) |>
-  filter(year >= year(min(all.data$month))) |>
-  na.omit()
-
-# Calculate years of service
-years_of_service <- as.integer(difftime(max(all.data$month), min(all.data$month), units = "days") / 365.25)
-retirement_benefit_years <- 15
-# Test the function
-annual_benefit=calculate_trs(starting_salary, wage_growth_data, inflation_data, years_of_service, retirement_benefit_years)
-```
-
-```{r}
-#| warning: false
-#| message: false
-# Adjust benefit for inflation during retirement
-    for (year in 1:retirement_benefit_years) {
-      if (year > nrow(inflation_data)) break
-      cpi_adjustment <- inflation_data$annual_CPI_perct[year] / 100
-      annual_benefit <- annual_benefit * (1 + cpi_adjustment)
-      cat("Inflation Adjusted Annual Benefits for Year",year,":","$",annual_benefit,"\t Monthly Benefits:","$",annual_benefit/12,"\n")
-    }
-    
-```
 ```{r}
 #| warning: false
 #| message: false
@@ -750,7 +959,54 @@ calculate_orp_with_age <- function(starting_salary, starting_age, wage_growth_da
   
   return(result)
 }
+```
+###Testing the functions for the hypothetical employee. 
+```{r}
+#| warning: false
+#| message: false
+# Example usage:
+starting_salary <- 50000
 
+# Compute the annual ECI and CPI
+wage_growth_data <- WAGE_GROWTH_GOVT_EMPLOYEES |>
+  select(month, wage_growth_rate) |>
+  mutate(year = year(month)) |>
+  group_by(year) |>
+  summarize(annual_ECI = mean(wage_growth_rate, na.rm = TRUE)) |>
+  mutate(annual_ECI_perct = ((annual_ECI - lag(annual_ECI)) / lag(annual_ECI)) * 100) |>
+  filter(year >= year(min(all.data$month))) |>
+  na.omit()
+
+inflation_data <- INFLATION_US_URBAN_AVERAGE |>
+  select(month, US_City_Monthly_Inflation_Average) |>
+  mutate(year = year(month)) |>
+  group_by(year) |>
+  summarize(annual_CPI = mean(US_City_Monthly_Inflation_Average, na.rm = TRUE)) |>
+  mutate(annual_CPI_perct = ((annual_CPI - lag(annual_CPI)) / lag(annual_CPI)) * 100) |>
+  filter(year >= year(min(all.data$month))) |>
+  na.omit()
+
+# Calculate years of service
+years_of_service <- as.integer(difftime(max(all.data$month), min(all.data$month), units = "days") / 365.25)
+retirement_benefit_years <- 15 #when I joined the data, it seems like the starting year is 2010. hence 15 years expecting the employee joined around 2010 and retiring 2025
+# Test the function
+annual_benefit=calculate_trs(starting_salary, wage_growth_data, inflation_data, years_of_service, retirement_benefit_years)
+```
+
+```{r}
+#| warning: false
+#| message: false
+# Adjust benefit for inflation during retirement
+    for (year in 1:retirement_benefit_years) {
+      if (year > nrow(inflation_data)) break
+      cpi_adjustment <- inflation_data$annual_CPI_perct[year] / 100
+      annual_benefit <- annual_benefit * (1 + cpi_adjustment)
+      cat("Inflation Adjusted Annual Benefits for Year",year,":","$",annual_benefit,"\t Monthly Benefits:","$",annual_benefit/12,"\n")
+    }
+    
+```
+
+```{r}
  #Test the function with valid data
 starting_salary <- 50000
 starting_age <- 50
@@ -766,6 +1022,41 @@ cat("Total fund at retirement: $", round(result$total_balance, 2), "\n")
 cat("Annual payout (4% withdrawal): $", round(result$annual_payout, 2), "\n")
 cat("Monthly payout: $", round(result$monthly_payout, 2), "\n")
 ```
+
+##MONTE CARLO SIMULATION
+Inspired from [Youtube Video](https://www.youtube.com/watch?v=wrWmko61WMg)
+```{r}
+
+
+monte_carlo_simulations<-function(return_vect,ndays = 1000, n_sim = 100){
+  set.seed(0)
+  return_vect=1+return_vect
+  paths<-replicate(n_sim,
+                   expr=round(sample(return_vect,ndays,replace=TRUE),2)
+                   )
+  #to seee if there are any tail events
+  paths<-apply(paths,2,cumprod)
+  
+  paths<-data.table::data.table(paths)
+  paths$days<-1:nrow(paths)
+  paths<-data.table::melt(paths,id.vars="days")
+ 
+  return(paths)
+}
+
+visualize_simulations=function(path)
+{
+  ggplot(path,aes(x=days,y=(value-1)*100,col=variable))+
+    geom_line()+
+    theme_bw()+
+    theme(legend.position="none")+
+    
+    xlab("Days Invested")+
+    ylab("Portfolio Return (%)")
+}
+```
+
+
 ![](docs/rshinyapp.png){fig-align="center" width="680"}
 I am working on it to get it published.
 ```{r}
