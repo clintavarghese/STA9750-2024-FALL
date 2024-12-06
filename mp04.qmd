@@ -151,15 +151,14 @@ library(tidyverse)
 
 ### LOAD ENVIRONMENT VARIABLES\
 
-I created an account in both AlphaVantage and FRED to get the apikey, and those api keys are stored  as `AV_KEY` and `FRED_KEY` in the `.Renviron` file. 
+I created an account in both AlphaVantage and FRED to get the apikey, and those api keys are stored  as `AVKEY2` and `FRED_KEY` in the `.Renviron` file. 
 ```{r}
 #TASK 1 and TASK 2
 #| warning: false
 #| message: false
 # Load environment variables
 readRenviron("~/STA9750-2024-FALL/MP-DATA/.Renviron")
-# Load environment variables
-#source("~/STA9750-2024-FALL/functions_MP04.R")
+
 ```
 
 ### Functions To Fetch From AlphaVantage and FRED\
@@ -219,7 +218,7 @@ convert_to_a_table<-function(symbol_data)
 }
 
 fetch_alpha_vantage <- function(symbol, function_name = "TIME_SERIES_MONTHLY_ADJUSTED") {
-  av_key <- Sys.getenv("AV_KEY") ##apikey
+  av_key <- Sys.getenv("AVKEY2") ##apikey
   url <- paste0(
     "https://www.alphavantage.co/query?",
     "function=", function_name,
