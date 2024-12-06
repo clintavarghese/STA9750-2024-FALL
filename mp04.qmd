@@ -10,127 +10,84 @@ format:
     toc: true
 ---
 
-## INTRODUCTION\
+## INTRODUCTION 
 
-In this project, I am tackling a vital personal financial decision using R: selecting a retirement plan as a newly hired faculty member at CUNY. Faculty members have 30 days to choose between two options, and this decision is essentially permanent. Choosing the right plan is no small task—it requires careful analysis of financial trends, demographic assumptions, and personal circumstances. Through this project, I plan to dive into historical financial data and use a bootstrap inference strategy to estimate the probability that one plan outperforms the other.
-CUNY offers two retirement plans, the traditional defined-benefit Teachers Retirement System (TRS) plan and the newer defined-contribution Optional Retirement Plan (ORP). For this project, I ignore the effect of taxes as both plans offer pre-tax retirement savings, so whichever plan has the greater (nominal, pre-tax) income will also yield the greater (post-tax) take-home amount.
+In this project, I am tackling a vital personal financial decision using R: selecting a retirement plan as a newly hired faculty member at CUNY. Faculty members have 30 days to choose between two options, and this decision is essentially permanent. Choosing the right plan is no small task—it requires careful analysis of financial trends, demographic assumptions, and personal circumstances. Through this project, I plan to dive into historical financial data and use a bootstrap inference strategy to estimate the probability that one plan outperforms the other. CUNY offers two retirement plans, the traditional defined-benefit Teachers Retirement System (TRS) plan and the newer defined-contribution Optional Retirement Plan (ORP). For this project, I ignore the effect of taxes as both plans offer pre-tax retirement savings, so whichever plan has the greater (nominal, pre-tax) income will also yield the greater (post-tax) take-home amount.
 
-### Teachers Retirement System\
+### Teachers Retirement System 
 
-1. Employees pay a fixed percentage of their paycheck into the pension fund. 
-   For CUNY employees joining after March 31, 2012--which you may assume for 
-   this project--the so-called "Tier VI" contribution rates are based on the 
-   employee's annual salary and increase as follows: 
-   
-   - \$45,000 or less: 3%
-   - \$45,001 to \$55,000: 3.5%
-   - \$55,001 to \$75,000: 4.5%
-   - \$75,001 to \$100,000: 5.75%
-   - \$100,001 or more: 6%
-   
-2. The retirement benefit is calculated based on the _Final Average Salary_ of
-   the employee: following 2024 law changes, the FAS is computed based on the
-   final _three_ years salary. (Previously, FAS was computed based on 5 years: 
-   since salaries tend to increase monotonically over time, this is a major
-   win for TRS participants.) 
-   
-   If $N$ is the number of years served, the annual retirement benefit is: 
-   
-   - $1.67\% * \text{FAS} * N$ if $N \leq 20$
-   - $1.75\% * \text{FAS} * N$ if $N = 20$
-   - $(35\% + 2\% * (N - 20)) * \text{FAS}$ if $N \geq 20$[^3][^3b]
-   
-   In each case, the benefit is paid out equally over 12 months.
-   
-3. The benefit is increased annually by 50\% of the CPI, rounded _up_ to
-   the nearest tenth of a percent: *e.g.*, a CPI of 2.9\% gives an inflation
-   adjustment of 1.5\%. The benefit is capped _below_ at 1\% and _above_ at 3\%,
-   so a CPI of 10\% leads to a 3\% inflation adjustment while a CPI of 0\% leads
-   to a 1\% inflation adjustment. 
-   
-   The inflation adjustement is effective each September and the CPI used is
-   the aggregate monthly CPI of the previous 12 months; so the September 2024
-   adjustment depends on the CPI from September 2023 to August 2024.
-   
-If **N** is the number of years served, the annual retirement benefit is:
-**1.67%*FAS*N if N<=20**
-**1.75%*FAS*N if N=20**
-**(35%+2%*(N-20))*FAS*N if N>=20**
+1.  Employees pay a fixed percentage of their paycheck into the pension fund. For CUNY employees joining after March 31, 2012--which you may assume for this project--the so-called "Tier VI" contribution rates are based on the employee's annual salary and increase as follows:
+
+    -   \$45,000 or less: 3%
+    -   \$45,001 to \$55,000: 3.5%
+    -   \$55,001 to \$75,000: 4.5%
+    -   \$75,001 to \$100,000: 5.75%
+    -   \$100,001 or more: 6%
+
+2.  The retirement benefit is calculated based on the *Final Average Salary* of the employee: following 2024 law changes, the FAS is computed based on the final *three* years salary. (Previously, FAS was computed based on 5 years: since salaries tend to increase monotonically over time, this is a major win for TRS participants.)
+
+    If $N$ is the number of years served, the annual retirement benefit is:
+
+    -   $1.67\% * \text{FAS} * N$ if $N \leq 20$
+    -   $1.75\% * \text{FAS} * N$ if $N = 20$
+    -   $(35\% + 2\% * (N - 20)) * \text{FAS}$ if $N \geq 20$\[\^3\]\[\^3b\]
+
+    In each case, the benefit is paid out equally over 12 months.
+
+3.  The benefit is increased annually by 50% of the CPI, rounded *up* to the nearest tenth of a percent: *e.g.*, a CPI of 2.9% gives an inflation adjustment of 1.5%. The benefit is capped *below* at 1% and *above* at 3%, so a CPI of 10% leads to a 3% inflation adjustment while a CPI of 0% leads to a 1% inflation adjustment.
+
+    The inflation adjustement is effective each September and the CPI used is the aggregate monthly CPI of the previous 12 months; so the September 2024 adjustment depends on the CPI from September 2023 to August 2024.
+
+If **N** is the number of years served, the annual retirement benefit is: **1.67%*FAS*N if N\<=20** **1.75%*FAS*N if N=20** \*\*(35%+2%*(N-20))*FAS\*N if N\>=20\*\*
 
 The benefit is increased annually by 50% of the CPI, rounded up to the nearest tenth of a percent: e.g., a CPI of 2.9% gives an inflation adjustment of 1.5%. The benefit is capped below at 1% and above at 3%, so a CPI of 10% leads to a 3% inflation adjustment while a CPI of 0% leads to a 1% inflation adjustment.
 
 The inflation adjustement is effective each September and the CPI used is the aggregate monthly CPI of the previous 12 months; so the September 2024 adjustment depends on the CPI from September 2023 to August 2024.
 
-### Optional Retirement Plan\
+### Optional Retirement Plan 
 
-The ORP plan is more similar to a 401(k) plan offered by a private employer. The
-employee and the employer both make contributions to a retirement account which
-is then invested in the employee's choice of mutual funds. Those investments grow
-"tax-free" until the employee begins to withdraw them upon retirement. If the
-employee does not use up the funds, they are passed down to that employee's 
-spouse, children, or other heirs; if the employee uses the funds too quickly and
-zeros out the account balance, no additional retirement funds are available.
-Though the employee hopefully still has Social Security retirement benefits and
-other savings to cover living expenses. This type of plan is called a 
-*defined-contribution* plan as only the contributions to the retirement account
-are fixed by contract: the final balance depends on market factors outside of
-the employee's control. 
+The ORP plan is more similar to a 401(k) plan offered by a private employer. The employee and the employer both make contributions to a retirement account which is then invested in the employee's choice of mutual funds. Those investments grow "tax-free" until the employee begins to withdraw them upon retirement. If the employee does not use up the funds, they are passed down to that employee's spouse, children, or other heirs; if the employee uses the funds too quickly and zeros out the account balance, no additional retirement funds are available. Though the employee hopefully still has Social Security retirement benefits and other savings to cover living expenses. This type of plan is called a *defined-contribution* plan as only the contributions to the retirement account are fixed by contract: the final balance depends on market factors outside of the employee's control.
 
-At retirement, the employee has access to those funds and can choose to withdraw
-them at any rate desired. A general rule of thumb is withdrawing 4\% of the
-value per year, *e.g.*, this 
-[Schwab discussion](https://www.schwab.com/learn/story/beyond-4-rule-how-much-can-you-spend-retirement); 
-you can assume a constant withdrawal rate in your analysis. Note that 
-unwithdrawn funds continue to experience market returns. 
+At retirement, the employee has access to those funds and can choose to withdraw them at any rate desired. A general rule of thumb is withdrawing 4% of the value per year, *e.g.*, this [Schwab discussion](https://www.schwab.com/learn/story/beyond-4-rule-how-much-can-you-spend-retirement); you can assume a constant withdrawal rate in your analysis. Note that unwithdrawn funds continue to experience market returns.
 
-The funds available in a ORP account depend strongly on the investments chosen.
-For this analysis, you can assume that the ORP participants invest in a 
-[Fidelity Freedom Fund](https://www.fidelity.com/mutual-funds/fidelity-fund-portfolios/freedom-funds) 
-with the following asset allocation:[^6]
+The funds available in a ORP account depend strongly on the investments chosen. For this analysis, you can assume that the ORP participants invest in a [Fidelity Freedom Fund](https://www.fidelity.com/mutual-funds/fidelity-fund-portfolios/freedom-funds) with the following asset allocation:\[\^6\]
 
-- Age 25 to Age 49: 
-  - 54\% US Equities
-  - 36\% International Equities
-  - 10\% Bonds
-- Age 50 to Age 59: 
-  - 47\% US Equities
-  - 32\% International Equities
-  - 21\% Bonds
-- Age 60 to Age 74: 
-  - 34\% US Equities
-  - 23\% International Equities
-  - 43\% Bonds
-- Age 75 or older: 
-  - 19\% US Equities
-  - 13\% International Equities
-  - 62\% Bonds
-  - 6\% Short-Term Debt
-  
-Under the ORP, both the employee and the employer make monthly contributions to
-the employee's ORP account. These contributions are calculated as a percentage of
-the employee's annual salary. Specifically, the employee contributes at 
-the same rate as the TRS: 
+-   Age 25 to Age 49:
+    -   54% US Equities
+    -   36% International Equities
+    -   10% Bonds
+-   Age 50 to Age 59:
+    -   47% US Equities
+    -   32% International Equities
+    -   21% Bonds
+-   Age 60 to Age 74:
+    -   34% US Equities
+    -   23% International Equities
+    -   43% Bonds
+-   Age 75 or older:
+    -   19% US Equities
+    -   13% International Equities
+    -   62% Bonds
+    -   6% Short-Term Debt
 
-  - \$45,000 or less: 3%
-  - \$45,001 to \$55,000: 3.5%
-  - \$55,001 to \$75,000: 4.5%
-  - \$75,001 to \$100,000: 5.75%
-  - \$100,001 or more: 6%
-  
-The employer contribution is fixed at: 
+Under the ORP, both the employee and the employer make monthly contributions to the employee's ORP account. These contributions are calculated as a percentage of the employee's annual salary. Specifically, the employee contributes at the same rate as the TRS:
 
-  - 8% for the first seven years of employment at CUNY. 
-  - 10% for all years thereafter. 
+-   \$45,000 or less: 3%
+-   \$45,001 to \$55,000: 3.5%
+-   \$55,001 to \$75,000: 4.5%
+-   \$75,001 to \$100,000: 5.75%
+-   \$100,001 or more: 6%
 
-## DATA SOURCES\
+The employer contribution is fixed at:
 
-For this project, the data are collected from two economic and financial resources:
-- [AlphaVantage](https://www.alphavantage.co/): a commercial stock market 
-  data provider
-- [FRED](https://fred.stlouisfed.org/): the Federal Reserve Economic Data 
-  repository maintained by the Federal Reserve Bank of St. Louis.\
-  
-### LOAD NECESSARY PACKAGES \
+-   8% for the first seven years of employment at CUNY.
+-   10% for all years thereafter.
+
+## DATA SOURCES 
+
+For this project, the data are collected from two economic and financial resources: - [AlphaVantage](https://www.alphavantage.co/): a commercial stock market data provider - [FRED](https://fred.stlouisfed.org/): the Federal Reserve Economic Data repository maintained by the Federal Reserve Bank of St. Louis.\
+
+### LOAD NECESSARY PACKAGES 
 
 ```{r}
 #| warning: false
@@ -149,9 +106,10 @@ library(jsonlite)
 library(tidyverse)
 ```
 
-### LOAD ENVIRONMENT VARIABLES\
+### LOAD ENVIRONMENT VARIABLES 
 
-I created an account in both AlphaVantage and FRED to get the apikey, and those api keys are stored  as `AVKEY2` and `FRED_KEY` in the `.Renviron` file. 
+I created an account in both AlphaVantage and FRED to get the apikey, and those api keys are stored as `AVKEY2` and `FRED_KEY` in the `.Renviron` file.
+
 ```{r}
 #TASK 1 and TASK 2
 #| warning: false
@@ -161,7 +119,7 @@ readRenviron("~/STA9750-2024-FALL/MP-DATA/.Renviron")
 
 ```
 
-### Functions To Fetch From AlphaVantage and FRED\
+### Functions To Fetch From AlphaVantage and FRED 
 
 ```{r}
 #| warning: false
@@ -218,7 +176,7 @@ convert_to_a_table<-function(symbol_data)
 }
 
 fetch_alpha_vantage <- function(symbol, function_name = "TIME_SERIES_MONTHLY_ADJUSTED") {
-  av_key <- Sys.getenv("AVKEY2") ##apikey
+  av_key <- Sys.getenv("AV_KEY") ##apikey
   url <- paste0(
     "https://www.alphavantage.co/query?",
     "function=", function_name,
@@ -282,17 +240,11 @@ fetch_fred <- function(series_id) {
 
 ```
 
-## DATA ACQUISITION\
+## DATA ACQUISITION 
 
-As the next step, I have collected historical data covering
-- Rate of Inflation
-- Rate of Wage Growth
-- US Equity Market Returns
-- International Equity Market Returns
-- Bond Returns
-- Short Term Debt Returns
+As the next step, I have collected historical data covering - Rate of Inflation - Rate of Wage Growth - US Equity Market Returns - International Equity Market Returns - Bond Returns - Short Term Debt Returns
 
-### FRED Data\
+### FRED Data 
 
 ```{r}
 # Load necessary library
@@ -361,7 +313,7 @@ WAGE_GROWTH_DATA<-fetch_fred("CES0500000003")|>convert_fred_datatype()|>rename(w
 WAGE_GROWTH_GOVT_EMPLOYEES<-fetch_fred("CIU3026100000000I")|>convert_fred_datatype()|>rename(wage_growth_rate=value,month=date)
 ```
 
-### Functions to calculate return:\
+### Functions to calculate return: 
 
 ```{r}
 #| warning: false
@@ -377,7 +329,7 @@ calculate_return_symbol <- function(alpha_vantage_symbol_data) {
  
 ```
 
-### Functions to calculate long run averages\
+### Functions to calculate long run averages 
 
 ```{r}
 #| warning: false
@@ -395,7 +347,7 @@ long_run_monthly_avg <- function(returns_df){
 }
 ```
 
-### ALPHAVANTAGE Data\
+### ALPHAVANTAGE Data 
 
 ```{r}
 # Fetching US Equity Market Data Using ETFs
@@ -556,7 +508,6 @@ bonds.all.perc.returns <- list(
 
 ```
 
-
 ```{r}
 # Suppress Warnings and Messages During Execution
 #| warning: false  # Disables warnings
@@ -597,10 +548,9 @@ all.data <- list(
 
 ```
 
-## INITIAL ANALYSIS AND VISUALIZATION OF INPUT DATA\
+## INITIAL ANALYSIS AND VISUALIZATION OF INPUT DATA 
 
-### Comparing the Inflation in NYC and US Cities Average (1990-2024)\
-
+### Comparing the Inflation in NYC and US Cities Average (1990-2024) 
 
 ```{r}
 #| warning: false
@@ -621,7 +571,7 @@ ggplot (data = INFLATION_ALL|>filter(year(date)>=1990), aes(x=date, y=value,colo
         plot.title.position = "plot")
 ```
 
-### Montly Adjusted Close Prices of SPY, QQQ, and DIA (US MARKET EQUITY)\
+### Montly Adjusted Close Prices of SPY, QQQ, and DIA (US MARKET EQUITY) 
 
 ```{r}
 #| warning: false
@@ -639,7 +589,7 @@ gg<-ggplot(US_MARKET_EQUITY, aes(x = month, y = adjusted_close, color = symbol, 
 ggplotly(gg)
 ```
 
-### Montly Adjusted Close Prices of VTMGX,VEIEX(INTERNATIONAL_EQUITY)\
+### Montly Adjusted Close Prices of VTMGX,VEIEX(INTERNATIONAL_EQUITY) 
 
 ```{r}
 #| warning: false
@@ -657,7 +607,7 @@ gg2<-ggplot(INTERNATIONAL_MARKET_EQUITY, aes(x = month, y = adjusted_close, colo
 ggplotly(gg2)
 ```
 
-### Montly Adjusted Close Prices of AGG and VICSX(BOND MARKET EQUITY)\
+### Montly Adjusted Close Prices of AGG and VICSX(BOND MARKET EQUITY) 
 
 ```{r}
 #| warning: false
@@ -675,7 +625,7 @@ gg3<-ggplot(BOND_MARKET_EQUITY, aes(x = month, y = adjusted_close, color = symbo
 ggplotly(gg3)
 ```
 
-### Log10 Monthly Adjusted Close Prices for Bond, International, and US Market Equities\
+### Log10 Monthly Adjusted Close Prices for Bond, International, and US Market Equities 
 
 ```{r}
 #| warning: false
@@ -693,12 +643,12 @@ gg4<-ggplot(ALL.DATA, aes(x = month, y = log10(adjusted_close), color = type, gr
 ggplotly(gg4)
 ```
 
-- The Bonds Market Equity line exhibits smoother, more stable growth compared to the others, reflecting the generally lower volatility in bond markets.\
-- US Market Equity show greater volatility and fluctuation, characteristic of stock market performance, where prices tend to experience sharper rises and declines.\
-- International Market Equity provides insights into global economic trends, potentially reflecting periods of growth or decline in different countries or regions.\ 
-- The log10 transformation allows for a more uniform view of percentage changes, making the comparison of relative growth rates more apparent than comparing raw values.\
+-   The Bonds Market Equity line exhibits smoother, more stable growth compared to the others, reflecting the generally lower volatility in bond markets.\
+-   US Market Equity show greater volatility and fluctuation, characteristic of stock market performance, where prices tend to experience sharper rises and declines.\
+-   International Market Equity provides insights into global economic trends, potentially reflecting periods of growth or decline in different countries or regions. 
+-   The log10 transformation allows for a more uniform view of percentage changes, making the comparison of relative growth rates more apparent than comparing raw values.\
 
-### Equal-Weighted U.S. Market Equity Monthly and Annual Returns (SPY, QQQ, DIA)\
+### Equal-Weighted U.S. Market Equity Monthly and Annual Returns (SPY, QQQ, DIA) 
 
 ```{r}
 
@@ -764,7 +714,7 @@ ggplotly(ggg, dynamicTicks = TRUE) |>
          
 ```
 
-### Correlation between key economic indicators\
+### Correlation between key economic indicators 
 
 ```{r}
 #| warning: false
@@ -797,17 +747,17 @@ ggplot(correlation_heatmap, aes(x = variable1, y = variable2, fill = correlation
     panel.grid = element_blank()
   )
 ```
-- wage_growth_rate and US_City_Monthly_Inflation_Average have a high correlation (0.9878), suggesting that as inflation increases, wage growth tends to increase. \
-- US_equity_market_return and wage_growth_rate (0.0184) show almost no relationship. Bonds_equity_market_return and wage_growth_rate (-0.0960) exhibit a slight inverse relationship.\ 
-- US_equity_market_return and Int_equity_market_return have a strong positive correlation (0.8176), indicating that international and US equity markets move similarly. \
-- Bonds_equity_market_return and VSGDX_returns(%) have a strong positive correlation (0.8354), reflecting alignment between bond and specific equity market returns.\ 
--Wage Growth & Inflation: The high correlation (0.9878) between wage growth and inflation suggests that wage adjustments might follow inflation trends.\
-- Equities & Bonds: The mixed correlations (positive and negative) across equity and bond returns reflect diverse market dynamics.\
 
-## HISTORICAL COMPARISON OF TRS and ORP\
+-   wage_growth_rate and US_City_Monthly_Inflation_Average have a high correlation (0.9878), suggesting that as inflation increases, wage growth tends to increase.\
+-   US_equity_market_return and wage_growth_rate (0.0184) show almost no relationship. Bonds_equity_market_return and wage_growth_rate (-0.0960) exhibit a slight inverse relationship. 
+-   US_equity_market_return and Int_equity_market_return have a strong positive correlation (0.8176), indicating that international and US equity markets move similarly.\
+-   Bonds_equity_market_return and VSGDX_returns(%) have a strong positive correlation (0.8354), reflecting alignment between bond and specific equity market returns.  -Wage Growth & Inflation: The high correlation (0.9878) between wage growth and inflation suggests that wage adjustments might follow inflation trends.\
+-   Equities & Bonds: The mixed correlations (positive and negative) across equity and bond returns reflect diverse market dynamics.\
 
-I am trying to do a comparison of TRS and ORP with collected historical data. 
-The assumption is the CUNY employee joined the first month of the historical data and retired from CUNY at the end of the final month of data.
+## HISTORICAL COMPARISON OF TRS and ORP 
+
+I am trying to do a comparison of TRS and ORP with collected historical data. The assumption is the CUNY employee joined the first month of the historical data and retired from CUNY at the end of the final month of data.
+
 ```{r}
 ##function to calculate TRS
 calculate_trs <- function(starting_salary, wage_growth_data, inflation_data, years_of_service, retirement_benefit_years) {
@@ -1033,7 +983,7 @@ calculate_orp_with_age <- function(starting_salary, starting_age, wage_growth_da
 }
 ```
 
-### Testing the functions for the hypothetical employee\
+### Testing the functions for the hypothetical employee 
 
 ```{r}
 #| warning: false
@@ -1096,10 +1046,12 @@ cat("Total fund at retirement: $", round(result$total_balance, 2), "\n")
 cat("Annual payout (4% withdrawal): $", round(result$annual_payout, 2), "\n")
 cat("Monthly payout: $", round(result$monthly_payout, 2), "\n")
 ```
-
-## MONTE CARLO SIMULATION\
+- \For Stability and Predictability: TRS is a better option for individuals seeking guaranteed income with less risk and no need for active fund management.
+- \For Higher Potential Income: ORP is advantageous for individuals willing to manage their investments, providing higher payouts and financial flexibility, albeit with market-dependent risks.
+## MONTE CARLO SIMULATION 
 
 Inspired from [Youtube Video](https://www.youtube.com/watch?v=wrWmko61WMg) I tried doing Monte Carlo Simulation for the retirement portfolio returns for 1000 days
+
 ```{r}
       
 usequity.ret<-usequity.all.perc.returns|>select(US_equity_market_return)
@@ -1141,11 +1093,13 @@ path=monte_carlo_simulations(
 )
       visualize_simulations(path)
 ```
+
 ## EXTRA CREDIT
 
 I tried to create a shiny app for CUNY TRS Retirement Benefit Calculation. Unfortunately, I couldn't publish it, below are the screenshot and codes for the **CUNY TRS Retirement Benefit Calculator**. Feel Free to replicate
 
 ![](docs/rshinyapp.png){fig-align="center" width="680"}
+
 ```{r}
 #|warning: false
 #|message: false
@@ -1276,5 +1230,3 @@ output$salary_plot <- renderPlotly({
 shinyApp(ui = ui, server = server)
 
 ```
-
-
