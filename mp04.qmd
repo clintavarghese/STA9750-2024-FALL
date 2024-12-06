@@ -247,12 +247,13 @@ As the next step, I have collected historical data covering - Rate of Inflation 
 ### FRED Data 
 
 ```{r}
+# Suppress warnings and messages for better readability of output
+#| warning: false  # Disable warnings
+#| message: false
 # Load necessary library
 library(lubridate)  # For working with dates (e.g., extracting year from a date object)
 
-# Suppress warnings and messages for better readability of output
-#| warning: false  # Disable warnings
-#| message: false  # Disable messages
+  # Disable messages
 
 # Fetching and processing inflation data
 
@@ -269,7 +270,9 @@ INFLATION_ANNUAL <- fetch_fred(series_id = "FPCPITOTLZGUSA") |>
 INFLATION_US_URBAN_AVERAGE <- fetch_fred(series_id = "CPIAUCSL") |> 
   convert_fred_datatype() |> 
   rename(US_City_Monthly_Inflation_Average = value, month = date)
-
+# Suppress warnings and messages for better readability of output
+#| warning: false  # Disable warnings
+#| message: false
 # 3. **Annual Inflation Average and Percentage Change**
 # Calculates the annual average of monthly inflation data
 # Groups data by year, computes the mean for each year, and calculates percentage changes compared to the previous year
@@ -658,6 +661,8 @@ calculate.return=function(alpha_vantage_symbol_data){
   ret_vect<-alpha_vantage_symbol_data$adjusted_close/lag(alpha_vantage_symbol_data$adjusted_close)-1
   return(ret_vect)
 }
+#| warning: false
+#| message: false
 calculate_monthly_average_return=function(alpha_vantage_symbol_data){
   ret_df=alpha_vantage_symbol_data|>group_by(month)|>
     summarize(average_monthly_return=round(mean(returns,na.rm=TRUE),3),
@@ -667,12 +672,16 @@ calculate_monthly_average_return=function(alpha_vantage_symbol_data){
            month = as.Date(paste0(month, "-01")))
   return(ret_df)
 }
+#| warning: false
+#| message: false
 calculate_annual_average_return=function(average_return_data){
   rect_df<-average_return_data %>%
     group_by(year) %>%
     summarise(`annual_return_(%)` = round((prod(1 + average_monthly_return, na.rm = TRUE)^(1 / 12) - 1),5)*100)
   return(rect_df)
 }
+#| warning: false
+#| message: false
 US_MARKET_EQUITY_RETURNS<-US_MARKET_EQUITY |>
   group_by(symbol) |>
   mutate(returns = calculate.return(cur_data()))|>calculate_monthly_average_return()
@@ -749,7 +758,7 @@ ggplot(correlation_heatmap, aes(x = variable1, y = variable2, fill = correlation
 ```
 
 -   wage_growth_rate and US_City_Monthly_Inflation_Average have a high correlation (0.9878), suggesting that as inflation increases, wage growth tends to increase.\
--   US_equity_market_return and wage_growth_rate (0.0184) show almost no relationship. Bonds_equity_market_return and wage_growth_rate (-0.0960) exhibit a slight inverse relationship. 
+-   US_equity_market_return and wage_growth_rate (0.0184) show almost no relationship. Bonds_equity_market_return and wage_growth_rate (-0.0960) exhibit a slight inverse relationship.
 -   US_equity_market_return and Int_equity_market_return have a strong positive correlation (0.8176), indicating that international and US equity markets move similarly.\
 -   Bonds_equity_market_return and VSGDX_returns(%) have a strong positive correlation (0.8354), reflecting alignment between bond and specific equity market returns.  -Wage Growth & Inflation: The high correlation (0.9878) between wage growth and inflation suggests that wage adjustments might follow inflation trends.\
 -   Equities & Bonds: The mixed correlations (positive and negative) across equity and bond returns reflect diverse market dynamics.\
@@ -759,6 +768,11 @@ ggplot(correlation_heatmap, aes(x = variable1, y = variable2, fill = correlation
 I am trying to do a comparison of TRS and ORP with collected historical data. The assumption is the CUNY employee joined the first month of the historical data and retired from CUNY at the end of the final month of data.
 
 ```{r}
+#|warning: false
+
+
+
+
 ##function to calculate TRS
 calculate_trs <- function(starting_salary, wage_growth_data, inflation_data, years_of_service, retirement_benefit_years) {
   
@@ -1048,12 +1062,14 @@ cat("Monthly payout: $", round(result$monthly_payout, 2), "\n")
 ```
 - \For Stability and Predictability: TRS is a better option for individuals seeking guaranteed income with less risk and no need for active fund management.
 - \For Higher Potential Income: ORP is advantageous for individuals willing to manage their investments, providing higher payouts and financial flexibility, albeit with market-dependent risks.
-## MONTE CARLO SIMULATION 
+
+## MONTE CARLO SIMULATION \
 
 Inspired from [Youtube Video](https://www.youtube.com/watch?v=wrWmko61WMg) I tried doing Monte Carlo Simulation for the retirement portfolio returns for 1000 days
 
 ```{r}
-      
+ #|warning: false
+ #|message: false     
 usequity.ret<-usequity.all.perc.returns|>select(US_equity_market_return)
 int.ret<-int.all.perc.returns|>select(Int_equity_market_return)
 bonds.ret<-bonds.all.perc.returns|>select(Bonds_equity_market_return)
@@ -1103,6 +1119,7 @@ I tried to create a shiny app for CUNY TRS Retirement Benefit Calculation. Unfor
 ```{r}
 #|warning: false
 #|message: false
+#| echo: false
 # Load the shiny library
 library(shiny)
 
