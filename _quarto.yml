@@ -5,7 +5,7 @@ project:
 website:
   title: "CLINTA PUTHUSSERY VARGHESE"
   description:
-    Course Projects for STA 9750 at Baruch College
+    Course Projects for MS Statistics
    site-url:"https://clintavarghese.github.io/"
    repo-url:"https://github.com/clintavarghese/STA9750-2024-FALL/"
    repo-actions:[edit, source, issue]
